@@ -102,7 +102,23 @@ layout (index = 1) subroutine (FragmentProgram) void mean_value()
 
 layout (index = 2) subroutine (FragmentProgram) void brightness_contrast()
 {
-    out_color = texture(textures.tex, Input.uv);
+	/* Op Parameter: Param #1 X
+	* Scale in side menu just in integer steps, but a picture with brightness one is just white --> scale the param with 0.1
+	*/
+	float brightness = parameter.paramA.x * 0.1;
+
+	/* Op Parameter: Param #2 X
+	* Scale in side menu just in integer steps, for a better adjustment --> scale the param with 0.1
+	* Due to that, the initial value is still 0*0.1, that's just gray --> the value should not be 0 --> define the range with the function clamp
+	* But than, the initial value is still 0.01 and not the original pricture --> add 1 so it is 1.01 and ca. the picture we want
+	*/
+	// lecture formular just for changing contrast: sk(x,y) = s(x,y) * contrast + 0.5(1 - contrast)
+	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
+
+	// lecture: s'(x,y) = (s(x,y) + brightness) *contrast
+
+	// texture(textures.tex, Input.uv) is the color at the pixel with the coordinates u and v
+    out_color = (texture(textures.tex, Input.uv) + brightness) * contrast + 0.5 * (1 - contrast);
 }
 
 
