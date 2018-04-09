@@ -7,7 +7,6 @@
 #include <AntTweakBar.h>
 
 
-
 namespace cgbv
 {
 	void TW_CALL handleScreenshot(void *data)
@@ -40,7 +39,7 @@ namespace cgbv
         glDeleteBuffers(1, &canvas.vbo);
         glDeleteVertexArrays(1, &canvas.vao);
         glDeleteSamplers(1, &sampler);
-        glDeleteFramebuffers(1, &fbo);
+        glDeleteFramebuffers(2, fbo);
     }
 
 
@@ -59,9 +58,6 @@ namespace cgbv
 
     void BVRenderer::input(int key, int scancode, int action, int modifiers)
     {
-        TwEventCharGLFW(key, action);
-        TwEventKeyGLFW(key, action);
-
         switch(key)
         {
             case GLFW_KEY_UP:
@@ -178,20 +174,39 @@ namespace cgbv
         framebufferTexture = std::make_unique<cgbv::textures::Texture2DRect>();
 
         glBindTexture(GL_TEXTURE_RECTANGLE, framebufferTexture->getTextureID());
-        glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 1280, 720, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
         glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        glGenFramebuffers(1, &fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+		secondframebufferTexture = std::make_unique<cgbv::textures::Texture2DRect>();
+
+		glBindTexture(GL_TEXTURE_RECTANGLE, secondframebufferTexture->getTextureID());
+		glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+
+
+        glGenFramebuffers(2, fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
 
         glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, framebufferTexture->getTextureID(), 0);
         GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
         glDrawBuffers(1, drawBuffers);
 
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            std::cout << "Framebuffer kaputt!" << std::endl;
+            std::cout << "Framebuffer 1 kaputt!" << std::endl;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
+
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, secondframebufferTexture->getTextureID(), 0);
+		glDrawBuffers(1, drawBuffers);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Framebuffer 2 kaputt!" << std::endl;
 
 
 
@@ -246,6 +261,11 @@ namespace cgbv
 
     void BVRenderer::render()
     {
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader->use();
@@ -279,7 +299,7 @@ namespace cgbv
                 renderpass(texture[uiParams.activeTexture].getTextureID(), 0);
                 break;
             case 2:
-                glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+                glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
                 glViewport(0, 0, 1280, 720);
                 renderpass(texture[uiParams.activeTexture].getTextureID(), 0);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -287,20 +307,23 @@ namespace cgbv
                 renderpass(framebufferTexture->getTextureID(), 1);
                 break;
             case 3:
-                glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+                glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
                 glViewport(0, 0, 1280, 720);
                 renderpass(texture[uiParams.activeTexture].getTextureID(), 0);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
                 renderpass(framebufferTexture->getTextureID(), 1);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(0, 0, window_width, window_height);
-                renderpass(framebufferTexture->getTextureID(), 2);
+                renderpass(secondframebufferTexture->getTextureID(), 2);
                 break;
             case 4:
-                glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+                glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
                 glViewport(0, 0, 1280, 720);
                 renderpass(texture[uiParams.activeTexture].getTextureID(), 0);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
                 renderpass(framebufferTexture->getTextureID(), 1);
-                renderpass(framebufferTexture->getTextureID(), 2);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
+                renderpass(secondframebufferTexture->getTextureID(), 2);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(0, 0, window_width, window_height);
                 renderpass(framebufferTexture->getTextureID(), 3);

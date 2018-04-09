@@ -10,7 +10,6 @@
 #include <FrameCounter.h>
 #include <bitset>
 
-
 namespace cgbv
 {
     struct ShaderLocations
@@ -54,10 +53,11 @@ namespace cgbv
         std::vector<cgbv::textures::Texture2DRect> texSet;
         std::unique_ptr<cgbv::textures::Texture2DRect[]> texture;
         std::unique_ptr<cgbv::textures::Texture2DRect> framebufferTexture;
+        std::unique_ptr<cgbv::textures::Texture2DRect> secondframebufferTexture;
 
         unsigned int sampler;
 
-        unsigned int fbo;
+        unsigned int fbo[2];
 
 		ProgramParameter uiParams;
 
