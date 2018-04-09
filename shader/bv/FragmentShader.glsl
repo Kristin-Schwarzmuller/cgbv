@@ -128,15 +128,47 @@ layout (index = 3) subroutine (FragmentProgram) void sharpen()
 }
 
 
-layout (index = 4) subroutine (FragmentProgram) void dilataion()
+layout (index = 4) subroutine (FragmentProgram) void dilatation()
 {
-    out_color = texture(textures.tex, Input.uv);
+    vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
+	vec4 max = vec4(0.f, 0.f, 0.f, 1.f);
+
+    //   1  1  1
+    //   1  1  1
+    //   1  1  1
+
+    for(int i = 0; i < 9; ++i) {
+        texel = texture(textures.tex, Input.uv + offsets3x3[i]);
+		if (texel.x > max.x)
+			max.x = texel.x;
+		if (texel.y > max.y)
+			max.y = texel.y;
+		if (texel.z > max.z)
+			max.z = texel.z;
+	}
+    out_color = max;
 }
 
 
 layout (index = 5) subroutine (FragmentProgram) void erosion()
 {
-    out_color = texture(textures.tex, Input.uv);
+    vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
+	vec4 min = vec4(1.f, 1.f, 1.f, 1.f);
+
+    //   1  1  1
+    //   1  1  1
+    //   1  1  1
+
+    for(int i = 0; i < 9; ++i) {
+        texel = texture(textures.tex, Input.uv + offsets3x3[i]);
+		if (texel.x < min.x)
+			min.x = texel.x;
+		if (texel.y < min.y)
+			min.y = texel.y;
+		if (texel.z < min.z)
+			min.z = texel.z;
+	}
+    out_color = min;
 }
 
 
@@ -181,9 +213,36 @@ layout (index = 12) subroutine (FragmentProgram) void laplace()
 	out_color = texture(textures.tex, Input.uv);
 }
 
+float[9] mysort(float[9] array)
+{
+   int i, j;
+   float tmp;
+
+   for (i = 0; i < 9 ; i++) 
+   {
+      for (j = i; j < 9 ; j++) 
+      {
+          if (array[i] > array[j]) 
+          {
+              tmp = array[i];
+              array[i] = array[j];
+              array[j] = tmp;
+          }
+      }
+   }
+	return array; 
+}
 
 layout (index = 13) subroutine (FragmentProgram) void median()
 {
-    out_color = texture(textures.tex, Input.uv);
+    float texel[9];
+
+    for(int i = 0; i < 9; ++i) {
+        texel[i] = dot(texture(textures.tex, Input.uv + offsets3x3[i]).xyz, vec3(.299f, .587f, .114f));
+	}
+
+	float sorted[9] = mysort(texel);
+
+    out_color = vec4(sorted[4]);
 }
 // =============================================================================================================
