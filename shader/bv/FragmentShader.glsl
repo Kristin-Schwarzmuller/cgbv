@@ -174,7 +174,24 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
 
 layout (index = 6) subroutine (FragmentProgram) void gauss3x3()
 {
-    out_color = texture(textures.tex, Input.uv);
+	int m = 3;
+	int k = (m - 1) / 2;
+	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
+	vec2 offset = vec2(0.f, 0.f);
+	int H [9] = int[](
+				1, 2, 1,
+				2, 4, 2,
+				1, 2, 1		);
+
+	for(int i = 0; i < m; ++i) {
+		for(int j = 0; j < m; ++j) {
+			offset.x = k - i;
+			offset.y = k - j;
+			texel += H[m * i + j] * texture(textures.tex, Input.uv + offset);
+		}
+	}
+
+    out_color = 9 * texel / (m * m * 16);
 }
 
 
