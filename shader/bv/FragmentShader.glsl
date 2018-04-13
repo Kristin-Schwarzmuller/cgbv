@@ -1,6 +1,5 @@
 #version 430 // change later
 
-
 // Structures
 // =============================================================================================================
 struct Matrices
@@ -174,24 +173,32 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
 
 layout (index = 6) subroutine (FragmentProgram) void gauss3x3()
 {
+	// für die Formel für H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
+
+	// Weil wir eine 3x3 Umgebung betrachten
 	int m = 3;
-	int k = (m - 1) / 2;
+	const float pi = 3.141592653589;
+	
+	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
+	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
+
+	// Filterkern
+	float H[9] = float[](	
+							0.f, 0.f, 0.f,
+							0.f, 0.f, 0.f, 
+							0.f, 0.f, 0.f	);
+	// Summe der Filterkerne; besseres Ergebnis als bei der Verwendung von m^2 bei der Teilung der Summe
+	float sumH = 0;
+	
 	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
-	vec2 offset = vec2(0.f, 0.f);
-	int H [9] = int[](
-				1, 2, 1,
-				2, 4, 2,
-				1, 2, 1		);
 
-	for(int i = 0; i < m; ++i) {
-		for(int j = 0; j < m; ++j) {
-			offset.x = k - i;
-			offset.y = k - j;
-			texel += H[m * i + j] * texture(textures.tex, Input.uv + offset);
+	for(int i = 0; i < 9; ++i) {
+		H[i] = exp(-((offsets3x3[i].x)*(offsets3x3[i].x) + (offsets3x3[i].y)*(offsets3x3[i].y)) / (2.f * var)) / (2.f * pi * var);
+		texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
+		sumH += H[i];
 		}
-	}
 
-    out_color = 9 * texel / (m * m * 16);
+    out_color = texel / sumH;
 }
 
 
