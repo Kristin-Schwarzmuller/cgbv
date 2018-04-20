@@ -145,7 +145,9 @@ layout (index = 2) subroutine (FragmentProgram) void brightness_contrast()
 
 layout (index = 3) subroutine (FragmentProgram) void sharpen()
 {
-    out_color = texture(textures.tex, Input.uv);
+	vec4 lapaceFiltered = lapace();
+	float param = parameter.paramA.x * 0.1;
+    out_color = texture(textures.tex, Input.uv) + param * lapaceFiltered;
 }
 
 
@@ -233,7 +235,7 @@ layout (index = 7) subroutine (FragmentProgram) void gauss5x5()
 	const float pi = 3.141592653589;
 	
 	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
-	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
+	float var = clamp((parameter.paramB.y) + 1, 0.01, 10);
 
 	// Filterkern
 	float H[25] = float[](	
@@ -266,7 +268,7 @@ layout (index = 8) subroutine (FragmentProgram) void gauss7x7()
 	const float pi = 3.141592653589;
 	
 	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
-	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
+	float var = clamp((parameter.paramA.z) + 1, 0.01, 10);
 
 	// Filterkern
 	float H[49] = float[](	
@@ -297,17 +299,17 @@ layout (index = 9) subroutine (FragmentProgram) void gauss7x7vertical()
     float H[7] = float[]( 1.f, 2.f, 3.f, 4.f, 3.f, 2.f, 1.f);
 
 	vec2 offsets7x1[7] = vec2[]
-(
-vec2(-3, 0), 
-vec2(-2, 0), 
-vec2(-1, 0), 
- vec2(0, 0), 
- vec2(1, 0), 
- vec2(2, 0), 
- vec2(3, 0) 
-);
+	(
+	vec2(-3, 0), 
+	vec2(-2, 0), 
+	vec2(-1, 0), 
+	 vec2(0, 0), 
+	 vec2(1, 0), 
+	 vec2(2, 0), 
+	 vec2(3, 0) 
+	);
 
-vec4 texel = vec4(0);
+	vec4 texel = vec4(0);
 
  for(int i = 0; i < 7; ++i)
         texel += H[i] * texture(textures.tex, Input.uv + offsets7x1[i]);
@@ -321,11 +323,9 @@ layout (index = 10) subroutine (FragmentProgram) void gauss7x7horizontal()
 {
      float H[7] = float[]( 1.f, 2.f, 3.f, 4.f, 3.f, 2.f, 1.f);
 
-	  vec2 offsets1x7[7] = vec2[]
-(
-vec2(0, -3), vec2(0, -2), vec2(0, -1), vec2(0, 0), vec2(0, 1), vec2(0, 2), vec2(0, 3)
-);
-vec4 texel = vec4(0);
+	vec2 offsets1x7[7] = vec2[]
+		(vec2(0, -3), vec2(0, -2), vec2(0, -1), vec2(0, 0), vec2(0, 1), vec2(0, 2), vec2(0, 3));
+	vec4 texel = vec4(0);
 
  for(int i = 0; i < 7; ++i)
         texel += H[i] * texture(textures.tex, Input.uv + offsets1x7[i]);
@@ -337,12 +337,35 @@ vec4 texel = vec4(0);
 
 layout (index = 11) subroutine (FragmentProgram) void sobel()
 {
-    out_color = texture(textures.tex, Input.uv);
+	// Filterkerne f¨ur horizontale und vertikale Kantenextraktion
+	// 	-1 -2 -1 		1 0 -1
+	// Hx =	 0  0  0 	Hy =	2 0 -2
+	// 	 1  2  1 		1 0 -1
+	
+	//Schwellwert: Pixel der Sobelbetrag angezeigt werden, für die der Sobelbetrag größer oder gleich dem Schwellwert is
+	float threshold = clamp((parameter.paramB.z) + 1, 0.01, 10);
+	
+	vec4 texel[9];
+	vec4 output;
+	
+	for(int i = 0; i < 9; ++i)
+        	texel[i] = texture(textures.tex, Input.uv + offsets3x3[i]);
+		
+	vec4 HorizEdge = texel[2] + 2*texel[5] + texel[8] - (texel[0] + 2*texel[3] + texel[6]);
+	vec4 VertEdge = texel[0] + 2*texel[1] + texel[2] - (texel[6] + 2*texel[7] + texel[8]);
+	
+	output.xyz = sqrt( HorizEdge.rgb * HorizEdge.rgb + VertEdge.rgb * VertEdge.rgb );
+	
+	if(output
+   	out_color = texture(textures.tex, Input.uv);
 }
 
 
 layout (index = 12) subroutine (FragmentProgram) void laplace()
 {
+	float brightnes = clamp((parameter.paramA.w) + 1, 0.01, 10);
+	float contrast = clamp((parameter.paramB.w) + 1, 0.01, 10);
+	
 	float H[9] = float[](	 0.f, -1.f, 0.f, 
 				-1.f, 4.f, -1.f,
 				0.f, -1.f, 0.f);
