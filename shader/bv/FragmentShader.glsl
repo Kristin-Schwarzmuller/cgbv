@@ -195,13 +195,13 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
 
 layout (index = 6) subroutine (FragmentProgram) void gauss3x3()
 {
-	// für die Formel für H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
+	// fÃ¼r die Formel fÃ¼r H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
 
 	// Weil wir eine 3x3 Umgebung betrachten
 	int m = 3;
 	const float pi = 3.141592653589;
 	
-	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
+	// Varianz die in der GUI eingegeben werden kann, wieder standardmÃ¤ÃŸig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
 	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
 
 	// Filterkern
@@ -226,13 +226,13 @@ layout (index = 6) subroutine (FragmentProgram) void gauss3x3()
 
 layout (index = 7) subroutine (FragmentProgram) void gauss5x5()
 {
-    // für die Formel für H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
+    // fÃ¼r die Formel fÃ¼r H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
 
 	// Weil wir eine 5x5 Umgebung betrachten
 	int m = 5;
 	const float pi = 3.141592653589;
 	
-	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
+	// Varianz die in der GUI eingegeben werden kann, wieder standardmÃ¤ÃŸig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
 	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
 
 	// Filterkern
@@ -259,13 +259,13 @@ layout (index = 7) subroutine (FragmentProgram) void gauss5x5()
 
 layout (index = 8) subroutine (FragmentProgram) void gauss7x7()
 {
-    // für die Formel für H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
+    // fÃ¼r die Formel fÃ¼r H siehe https://de.wikipedia.org/wiki/Gau%C3%9F-Filter
 
 	// Weil wir eine 7x7 Umgebung betrachten
 	int m = 7;
 	const float pi = 3.141592653589;
 	
-	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
+	// Varianz die in der GUI eingegeben werden kann, wieder standardmÃ¤ÃŸig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
 	float var = clamp((parameter.paramA.y) + 1, 0.01, 10);
 
 	// Filterkern
@@ -343,6 +343,14 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 
 layout (index = 12) subroutine (FragmentProgram) void laplace()
 {
+	float H[9] = float[](	 0.f, -1.f, 0.f, 
+				-1.f, 4.f, -1.f,
+				0.f, -1.f, 0.f);
+	vec4 texel = vec4(0);
+
+ 	for(int i = 0; i < 9; ++i)
+        	texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
+				
 	out_color = texture(textures.tex, Input.uv);
 }
 
