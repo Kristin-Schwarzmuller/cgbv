@@ -142,11 +142,32 @@ layout (index = 2) subroutine (FragmentProgram) void brightness_contrast()
     out_color = (texture(textures.tex, Input.uv) + brightness) * contrast + 0.5 * (1 - contrast);
 }
 
+vec4 helpingLaplace(vec4[9] inputVec)
+{
+	vec4 texel;
+	float brightness = parameter.paramA.x * 0.1;
+	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
+
+	float H[9] = float[](	 0.f, -1.f,  0.f, 
+							-1.f,  4.f, -1.f,
+							 0.f, -1.f,  0.f);
+
+ 	for(int i = 0; i < 9; ++i)
+        	texel += H[i] * inputVec[i];
+
+	return ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
+}
+
 
 layout (index = 3) subroutine (FragmentProgram) void sharpen()
 {
-	vec4 lapaceFiltered = lapace();
-	float param = parameter.paramA.x * 0.1;
+	vec4[9] texel;
+	float param = parameter.paramA.w * 0.1;
+
+	for(int i = 0; i < 9; ++i)
+		texel[i] = texture(textures.tex, Input.uv + offsets3x3[i]);
+
+	vec4 lapaceFiltered = helpingLaplace(texel);
     out_color = texture(textures.tex, Input.uv) + param * lapaceFiltered;
 }
 
@@ -338,43 +359,56 @@ layout (index = 10) subroutine (FragmentProgram) void gauss7x7horizontal()
 layout (index = 11) subroutine (FragmentProgram) void sobel()
 {
 	// Filterkerne f¨ur horizontale und vertikale Kantenextraktion
-	// 	-1 -2 -1 		1 0 -1
+	// 		-1 -2 -1 			1 0 -1
 	// Hx =	 0  0  0 	Hy =	2 0 -2
-	// 	 1  2  1 		1 0 -1
+	// 		 1  2  1 			1 0 -1
 	
 	//Schwellwert: Pixel der Sobelbetrag angezeigt werden, für die der Sobelbetrag größer oder gleich dem Schwellwert is
-	float threshold = clamp((parameter.paramB.z) + 1, 0.01, 10);
+	float threshold = (parameter.paramB.z) / 100;
 	
 	vec4 texel[9];
-	vec4 output;
+	float outputSW;
 	
 	for(int i = 0; i < 9; ++i)
         	texel[i] = texture(textures.tex, Input.uv + offsets3x3[i]);
 		
-	vec4 HorizEdge = texel[2] + 2*texel[5] + texel[8] - (texel[0] + 2*texel[3] + texel[6]);
-	vec4 VertEdge = texel[0] + 2*texel[1] + texel[2] - (texel[6] + 2*texel[7] + texel[8]);
+	vec4 Horiz = texel[2] + 2*texel[5] + texel[8] - (texel[0] + 2*texel[3] + texel[6]);
+	vec4 Vert = texel[0] + 2*texel[1] + texel[2] - (texel[6] + 2*texel[7] + texel[8]);
 	
-	output.xyz = sqrt( HorizEdge.rgb * HorizEdge.rgb + VertEdge.rgb * VertEdge.rgb );
-	
-	if(output
-   	out_color = texture(textures.tex, Input.uv);
+	// Schwarz-Weiß Output
+	outputSW = dot(sqrt(Horiz * Horiz + Vert * Vert).xyz, vec3(.299f, .587f, .114f));
+
+	if(outputSW >= threshold) 
+   		out_color = vec4(outputSW); 
+	else 
+		out_color = vec4(0.f, 0.f, 0.f, 1.f);
+
+	//--------------------------------------------
+	/*  bunt
+	vec4 sobelOutput = sqrt(Horiz * Horiz + Vert * Vert);
+
+	if(((sobelOutput[0] + sobelOutput[1] + sobelOutput[2]) / 3) >= threshold) 
+   		out_color = sobelOutput; 
+	else 
+		out_color = vec4(0.f, 0.f, 0.f, 1.f);
+		-----------------------------------------*/
 }
 
 
 layout (index = 12) subroutine (FragmentProgram) void laplace()
 {
-	float brightnes = clamp((parameter.paramA.w) + 1, 0.01, 10);
-	float contrast = clamp((parameter.paramB.w) + 1, 0.01, 10);
-	
-	float H[9] = float[](	 0.f, -1.f, 0.f, 
-				-1.f, 4.f, -1.f,
-				0.f, -1.f, 0.f);
+	float brightness = parameter.paramA.x * 0.1;
+	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
+
+	float H[9] = float[](	 0.f, -1.f,  0.f, 
+							-1.f,  4.f, -1.f,
+							 0.f, -1.f,  0.f);
 	vec4 texel = vec4(0);
 
  	for(int i = 0; i < 9; ++i)
         	texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
-				
-	out_color = texture(textures.tex, Input.uv);
+
+	out_color = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
 }
 
 float[9] mysort(float[9] array)
