@@ -142,32 +142,25 @@ layout (index = 2) subroutine (FragmentProgram) void brightness_contrast()
     out_color = (texture(textures.tex, Input.uv) + brightness) * contrast + 0.5 * (1 - contrast);
 }
 
-vec4 helpingLaplace(vec4[9] inputVec)
+layout (index = 3) subroutine (FragmentProgram) void sharpen()
 {
 	vec4 texel;
+	float param = parameter.paramA.w * 0.1;
 	float brightness = parameter.paramA.x * 0.1;
 	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
-
+	
+	// Lapacefilter ------------------------------------------------
 	float H[9] = float[](	 0.f, -1.f,  0.f, 
 							-1.f,  4.f, -1.f,
 							 0.f, -1.f,  0.f);
 
- 	for(int i = 0; i < 9; ++i)
-        	texel += H[i] * inputVec[i];
-
-	return ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
-}
-
-
-layout (index = 3) subroutine (FragmentProgram) void sharpen()
-{
-	vec4[9] texel;
-	float param = parameter.paramA.w * 0.1;
-
 	for(int i = 0; i < 9; ++i)
-		texel[i] = texture(textures.tex, Input.uv + offsets3x3[i]);
+        texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
 
-	vec4 lapaceFiltered = helpingLaplace(texel);
+	vec4 lapaceFiltered = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
+	// -------------------------------------------------------------
+
+	// Sharpen = Original - c * lapace
     out_color = texture(textures.tex, Input.uv) + param * lapaceFiltered;
 }
 
@@ -181,6 +174,7 @@ layout (index = 4) subroutine (FragmentProgram) void dilatation()
     //   1  1  1
     //   1  1  1
 
+	// Auslesen der 3x3 Umgebung und Bestimmung der Maxima im R, G und B Bereich
     for(int i = 0; i < 9; ++i) {
         texel = texture(textures.tex, Input.uv + offsets3x3[i]);
 		if (texel.x > max.x)
@@ -202,7 +196,8 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
     //   1  1  1
     //   1  1  1
     //   1  1  1
-
+	
+	// Auslesen der 3x3 Umgebung und Bestimmung der Minima im R, G und B Bereich
     for(int i = 0; i < 9; ++i) {
         texel = texture(textures.tex, Input.uv + offsets3x3[i]);
 		if (texel.x < min.x)
@@ -238,7 +233,10 @@ layout (index = 6) subroutine (FragmentProgram) void gauss3x3()
 	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 
 	for(int i = 0; i < 9; ++i) {
+		// Berechnung des Filterkerns anhand der Formel
 		H[i] = exp(-((offsets3x3[i].x)*(offsets3x3[i].x) + (offsets3x3[i].y)*(offsets3x3[i].y)) / (2.f * var)) / (2.f * pi * var);
+
+		// Gewichtung und Aufsummierung
 		texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
 		sumH += H[i];
 		}
@@ -271,7 +269,10 @@ layout (index = 7) subroutine (FragmentProgram) void gauss5x5()
 	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 
 	for(int i = 0; i < 25; ++i) {
+		// Berechnung des Filterkerns anhand der Formel
 		H[i] = exp(-((offsets5x5[i].x)*(offsets5x5[i].x) + (offsets5x5[i].y)*(offsets5x5[i].y)) / (2.f * var)) / (2.f * pi * var);
+		
+		// Gewichtung und Aufsummierung
 		texel += H[i] * texture(textures.tex, Input.uv + offsets5x5[i]);
 		sumH += H[i];
 		}
@@ -306,7 +307,10 @@ layout (index = 8) subroutine (FragmentProgram) void gauss7x7()
 	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 
 	for(int i = 0; i < 49; ++i) {
+		// Berechnung des Filterkerns anhand der Formel
 		H[i] = exp(-((offsets7x7[i].x)*(offsets7x7[i].x) + (offsets7x7[i].y)*(offsets7x7[i].y)) / (2.f * var)) / (2.f * pi * var);
+		
+		// Gewichtung und Aufsummierung
 		texel += H[i] * texture(textures.tex, Input.uv + offsets7x7[i]);
 		sumH += H[i];
 		}
@@ -364,20 +368,23 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	// 		 1  2  1 			1 0 -1
 	
 	//Schwellwert: Pixel der Sobelbetrag angezeigt werden, für die der Sobelbetrag größer oder gleich dem Schwellwert is
-	float threshold = (parameter.paramB.z) / 100;
-	
+	float threshold = (parameter.paramB.z) * 0.1;
+
 	vec4 texel[9];
 	float outputSW;
 	
+	// Schreiben der 3x3 Umgebung in ein Array
 	for(int i = 0; i < 9; ++i)
         	texel[i] = texture(textures.tex, Input.uv + offsets3x3[i]);
-		
+
+	// Aufsummierung und Gewichtung anhand der Filterkerne	
 	vec4 Horiz = texel[2] + 2*texel[5] + texel[8] - (texel[0] + 2*texel[3] + texel[6]);
 	vec4 Vert = texel[0] + 2*texel[1] + texel[2] - (texel[6] + 2*texel[7] + texel[8]);
 	
-	// Schwarz-Weiß Output
+	// Schwarz-Weiß Output --> am relevantesten, da Grauwertänderungen besonders interessant bei sobel
 	outputSW = dot(sqrt(Horiz * Horiz + Vert * Vert).xyz, vec3(.299f, .587f, .114f));
 
+	// Nur ab einem bewissen Schwellwert sollen "Steigungen" zwischen den Grauwerten angezeigt werden, sonst schwarz = 0
 	if(outputSW >= threshold) 
    		out_color = vec4(outputSW); 
 	else 
@@ -397,20 +404,38 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 
 layout (index = 12) subroutine (FragmentProgram) void laplace()
 {
+	vec4 texel;
 	float brightness = parameter.paramA.x * 0.1;
 	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
 
-	float H[9] = float[](	 0.f, -1.f,  0.f, 
-							-1.f,  4.f, -1.f,
-							 0.f, -1.f,  0.f);
-	vec4 texel = vec4(0);
+	// Laplace-Filtermaske --> Gewichtung der umliegenden Pixel
+	float H[9] = float[](	-1.f, -1.f, -1.f, 
+							-1.f,  8.f, -1.f,
+							-1.f, -1.f, -1.f);
 
+							/* 1.f, -2.f,  1.f, 
+							-2.f,  4.f, -2.f,
+							 1.f, -2.f,  1.f);*/
+							 
+							 /*0.f, -1.f,  0.f, 
+							-1.f,  4.f, -1.f,
+							 0.f, -1.f,  0.f);*/
+	
+	// Gewichtung der umliegenden Pixel und Aufsummierung 
  	for(int i = 0; i < 9; ++i)
         	texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
 
+	/* 
+	* Da die obere Summe auf Grund der Gewichtungen auch negativ sein kann, muss der Wertebereich von [-1;1] wieder nach [0;1] verschoben werden.
+	* --> Wertebereich halbieren und um 0,5 verschieben;
+	* Anpassung der Helligkeit und des Contrastes anhand der Formel für Brightness-Contrast
+	*/
 	out_color = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
 }
 
+/*
+* Bubble Sort Algorithmus
+*/
 float[9] mysort(float[9] array)
 {
    int i, j;
@@ -435,12 +460,16 @@ layout (index = 13) subroutine (FragmentProgram) void median()
 {
     float texel[9];
 
+	// Schreiben der Grauwerte in ein Array, die mittels Skalarproduk berechnert werden 
+	//(hierbei ungleichmäßige Verteilung, der rgb Werte, da von menschlichem Auge unterschiedlich intensiv wahrgenommen)
     for(int i = 0; i < 9; ++i) {
         texel[i] = dot(texture(textures.tex, Input.uv + offsets3x3[i]).xyz, vec3(.299f, .587f, .114f));
 	}
 
+	// Sortieren des Arrays
 	float sorted[9] = mysort(texel);
 
+	// Median liegt genau in der Mitte des sortierten Arrays
     out_color = vec4(sorted[4]);
 }
 // =============================================================================================================
