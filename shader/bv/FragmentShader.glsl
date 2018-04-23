@@ -172,11 +172,12 @@ layout (index = 4) subroutine (FragmentProgram) void dilatation()
 {
     vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 	vec4 max = vec4(0.f, 0.f, 0.f, 1.f);
+	float param  = parameter.paramA.w;
 
     //   1  1  1
     //   1  1  1
     //   1  1  1
-
+	if (param == 0.f){
 	// Auslesen der 3x3 Umgebung und Bestimmung der Maxima im R, G und B Bereich
     for(int i = 0; i < 9; ++i) {
         texel = texture(textures.tex, Input.uv + offsets3x3[i]);
@@ -187,6 +188,30 @@ layout (index = 4) subroutine (FragmentProgram) void dilatation()
 		if (texel.z > max.z)
 			max.z = texel.z;
 	}
+	}
+	else if (param == 1.f){
+	 for(int i = 0; i < 25; ++i) {
+        texel = texture(textures.tex, Input.uv + offsets5x5[i]);
+		if (texel.x > max.x)
+			max.x = texel.x;
+		if (texel.y > max.y)
+			max.y = texel.y;
+		if (texel.z > max.z)
+			max.z = texel.z;
+	}
+	}
+	else {
+	for(int i = 0; i < 49; ++i) {
+        texel = texture(textures.tex, Input.uv + offsets7x7[i]);
+		if (texel.x > max.x)
+			max.x = texel.x;
+		if (texel.y > max.y)
+			max.y = texel.y;
+		if (texel.z > max.z)
+			max.z = texel.z;
+			}
+			}
+
     out_color = max;
 }
 
