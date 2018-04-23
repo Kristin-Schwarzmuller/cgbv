@@ -160,7 +160,7 @@ layout (index = 3) subroutine (FragmentProgram) void sharpen()
 	vec4 lapaceFiltered = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
 	// -------------------------------------------------------------
 
-	// Sharpen = Original - c * lapace
+	// Sharpen = Original + c * lapace
     out_color = texture(textures.tex, Input.uv) + param * lapaceFiltered;
 }
 
@@ -368,7 +368,7 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	// 		 1  2  1 			1 0 -1
 	
 	//Schwellwert: Pixel der Sobelbetrag angezeigt werden, für die der Sobelbetrag größer oder gleich dem Schwellwert is
-	float threshold = (parameter.paramB.z) / 100;
+	float threshold = (parameter.paramB.z) * 0.1;
 
 	vec4 texel[9];
 	float outputSW;
@@ -388,7 +388,7 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	if(outputSW >= threshold) 
    		out_color = vec4(outputSW); 
 	else 
-		out_color = vec4(0.f, 0.f, 0.f, 1.f);
+		 out_color = vec4(0.f, 0.f, 0.f, 1.f);
 
 	//--------------------------------------------
 	/*  bunt
@@ -397,8 +397,8 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	if(((sobelOutput[0] + sobelOutput[1] + sobelOutput[2]) / 3) >= threshold) 
    		out_color = sobelOutput; 
 	else 
-		out_color = vec4(0.f, 0.f, 0.f, 1.f);
-		-----------------------------------------*/
+		out_color = vec4(0.f, 0.f, 0.f, 1.f); */
+		//-----------------------------------------
 }
 
 
