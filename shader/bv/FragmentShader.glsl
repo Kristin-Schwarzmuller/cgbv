@@ -157,11 +157,10 @@ layout (index = 3) subroutine (FragmentProgram) void sharpen()
 	for(int i = 0; i < 9; ++i)
         texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
 
-<<<<<<< HEAD
-	vec4 lapaceFiltered = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
-=======
+	//vec4 lapaceFiltered = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
+
 	vec4 lapaceFiltered = texel;//((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
+
 	// -------------------------------------------------------------
 
 	// Sharpen = Original + c * lapace
@@ -201,18 +200,7 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
     //   1  1  1
     //   1  1  1
     //   1  1  1
-<<<<<<< HEAD
 	
-	// Auslesen der 3x3 Umgebung und Bestimmung der Minima im R, G und B Bereich
-    for(int i = 0; i < 9; ++i) {
-        texel = texture(textures.tex, Input.uv + offsets3x3[i]);
-		if (texel.x < min.x)
-			min.x = texel.x;
-		if (texel.y < min.y)
-			min.y = texel.y;
-		if (texel.z < min.z)
-			min.z = texel.z;
-=======
 	if(param == 0.f){ 
 		// Auslesen der 3x3 Umgebung und Bestimmung der Minima im R, G und B Bereich
 		for(int i = 0; i < 9; ++i) {
@@ -246,7 +234,6 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
 				if (texel.z < min.z)
 					min.z = texel.z;
 		}
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
 	}
     out_color = min;
 }
@@ -331,11 +318,8 @@ layout (index = 8) subroutine (FragmentProgram) void gauss7x7()
 	const float pi = 3.141592653589;
 	
 	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
-<<<<<<< HEAD
-	float var = clamp((parameter.paramA.z) + 1, 0.01, 10);
-=======
 	float var = clamp((parameter.paramA.z) + 1, 0.01, 10000);
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
+
 
 	// Filterkern
 	float H[49] = float[](	
@@ -433,11 +417,7 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	if(outputSW >= threshold) 
    		out_color = vec4(outputSW); 
 	else 
-<<<<<<< HEAD
 		 out_color = vec4(0.f, 0.f, 0.f, 1.f);
-=======
-		out_color = vec4(0.f, 0.f, 0.f, 1.f);
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
 
 	//--------------------------------------------
 	/*  bunt
@@ -446,13 +426,7 @@ layout (index = 11) subroutine (FragmentProgram) void sobel()
 	if(((sobelOutput[0] + sobelOutput[1] + sobelOutput[2]) / 3) >= threshold) 
    		out_color = sobelOutput; 
 	else 
-<<<<<<< HEAD
 		out_color = vec4(0.f, 0.f, 0.f, 1.f); */
-		//-----------------------------------------
-=======
-		out_color = vec4(0.f, 0.f, 0.f, 1.f);
-		-----------------------------------------*/
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
 }
 
 
@@ -463,11 +437,6 @@ layout (index = 12) subroutine (FragmentProgram) void laplace()
 	float contrast = clamp((parameter.paramB.x * 0.1) + 1.0, 0.01, 20);
 
 	// Laplace-Filtermaske --> Gewichtung der umliegenden Pixel
-<<<<<<< HEAD
-	float H[9] = float[](	 0.f, -1.f,  0.f, 
-							-1.f,  4.f, -1.f,
-							 0.f, -1.f,  0.f);
-=======
 	float H[9] = float[](	-1.f, -1.f, -1.f, 
 							-1.f,  8.f, -1.f,
 							-1.f, -1.f, -1.f);
@@ -479,7 +448,6 @@ layout (index = 12) subroutine (FragmentProgram) void laplace()
 							 /*0.f, -1.f,  0.f, 
 							-1.f,  4.f, -1.f,
 							 0.f, -1.f,  0.f);*/
->>>>>>> 16939e2833e74f96f45f45c91380cf0847af4d94
 	
 	// Gewichtung der umliegenden Pixel und Aufsummierung 
  	for(int i = 0; i < 9; ++i)
