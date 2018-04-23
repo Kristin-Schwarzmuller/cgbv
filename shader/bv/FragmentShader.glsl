@@ -157,10 +157,10 @@ layout (index = 3) subroutine (FragmentProgram) void sharpen()
 	for(int i = 0; i < 9; ++i)
         texel += H[i] * texture(textures.tex, Input.uv + offsets3x3[i]);
 
-	vec4 lapaceFiltered = ((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
+	vec4 lapaceFiltered = texel;//((texel / 2  + 0.5) + brightness) * contrast + 0.5 * (1 - contrast);
 	// -------------------------------------------------------------
 
-	// Sharpen = Original - c * lapace
+	// Sharpen = Original + c * lapace
     out_color = texture(textures.tex, Input.uv) + param * lapaceFiltered;
 }
 
@@ -192,20 +192,44 @@ layout (index = 5) subroutine (FragmentProgram) void erosion()
 {
     vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 	vec4 min = vec4(1.f, 1.f, 1.f, 1.f);
+	float param  = parameter.paramA.w;
 
     //   1  1  1
     //   1  1  1
     //   1  1  1
-	
-	// Auslesen der 3x3 Umgebung und Bestimmung der Minima im R, G und B Bereich
-    for(int i = 0; i < 9; ++i) {
-        texel = texture(textures.tex, Input.uv + offsets3x3[i]);
-		if (texel.x < min.x)
-			min.x = texel.x;
-		if (texel.y < min.y)
-			min.y = texel.y;
-		if (texel.z < min.z)
-			min.z = texel.z;
+	if(param == 0.f){ 
+		// Auslesen der 3x3 Umgebung und Bestimmung der Minima im R, G und B Bereich
+		for(int i = 0; i < 9; ++i) {
+			texel = texture(textures.tex, Input.uv + offsets3x3[i]);
+			if (texel.x < min.x)
+				min.x = texel.x;
+			if (texel.y < min.y)
+				min.y = texel.y;
+			if (texel.z < min.z)
+				min.z = texel.z;
+		}
+	}
+	else if (param == 1.f){
+			for(int i = 0; i < 25; ++i) {
+				texel = texture(textures.tex, Input.uv + offsets5x5[i]);
+				if (texel.x < min.x)
+					min.x = texel.x;
+				if (texel.y < min.y)
+					min.y = texel.y;
+				if (texel.z < min.z)
+					min.z = texel.z;
+			}
+	}
+	else {
+			for(int i = 0; i < 49; ++i) {
+				texel = texture(textures.tex, Input.uv + offsets7x7[i]);
+				if (texel.x < min.x)
+					min.x = texel.x;
+				if (texel.y < min.y)
+					min.y = texel.y;
+				if (texel.z < min.z)
+					min.z = texel.z;
+		}
 	}
     out_color = min;
 }
@@ -290,7 +314,7 @@ layout (index = 8) subroutine (FragmentProgram) void gauss7x7()
 	const float pi = 3.141592653589;
 	
 	// Varianz die in der GUI eingegeben werden kann, wieder standardmäßig auf 1 setzen und in der Rage 0.01 und 10 bewegen lassen
-	float var = clamp((parameter.paramA.z) + 1, 0.01, 10);
+	float var = clamp((parameter.paramA.z) + 1, 0.01, 10000);
 
 	// Filterkern
 	float H[49] = float[](	
