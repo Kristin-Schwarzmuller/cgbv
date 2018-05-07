@@ -80,4 +80,12 @@ subroutine (VertexProgram) void verts_and_normals()
     Output.lightDir = light.lightPos - mvPos;
     Output.viewDir = -mvPos;
 }
+
+// Subroutine Implementation
+// =============================================================================================================
+subroutine (VertexProgram) void simpleTrans()
+{
+    gl_Position = matrices.mvp * vertex;
+
+}
 // =============================================================================================================

@@ -97,8 +97,11 @@ namespace cgbv
         locs.normalmatrix = shader->getUniformLocation("matrices.normal");
         locs.modelview = shader->getUniformLocation("matrices.mv");
         locs.lightPos = shader->getUniformLocation("light.lightPos");
-        locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "toon");
-        locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+       // locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "toon");
+       // locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "red");
+		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 
 
 
