@@ -67,38 +67,38 @@ namespace cgbv
     }
 
 
-    bool CGRenderer::setup()
-    {
-        glfwGetFramebufferSize(window, &window_width, &window_height);
+	bool CGRenderer::setup()
+	{
+		glfwGetFramebufferSize(window, &window_width, &window_height);
 
 
-        if(!gladLoadGL())
-            return false;
+		if (!gladLoadGL())
+			return false;
 
 
-        // GL States
-        glClearColor(0.4f, 0.4f, 0.4f, 1.f);
+		// GL States
+		glClearColor(0.4f, 0.4f, 0.4f, 1.f);
 
-        glEnable(GL_ALPHA_TEST);
-        glEnable(GL_DEPTH_TEST);
+		glEnable(GL_ALPHA_TEST);
+		glEnable(GL_DEPTH_TEST);
 
 
 
-        projection = glm::perspective(float(M_PI) / 5.f, float(window_width) / float(window_height), .1f, 200.f);
+		projection = glm::perspective(float(M_PI) / 5.f, float(window_width) / float(window_height), .1f, 200.f);
 		camera.setTarget(glm::vec3(0.f, 0.f, 0.f));
 		camera.moveTo(0.f, -.5f, 5.f);
 
 
-        // Shader
-        shader = std::make_unique<cgbv::shader::GLSLShaderprogram>("../shader/cg/VertexShader.glsl", "../shader/cg/FragmentShader.glsl");
-        locs.vertex = shader->getAttribLocation("vertex");
-        locs.normal = shader->getAttribLocation("normal");
-        locs.modelViewProjection = shader->getUniformLocation("matrices.mvp");
-        locs.normalmatrix = shader->getUniformLocation("matrices.normal");
-        locs.modelview = shader->getUniformLocation("matrices.mv");
-        locs.lightPos = shader->getUniformLocation("light.lightPos");
-       // locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "toon");
-       // locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+		// Shader
+		shader = std::make_unique<cgbv::shader::GLSLShaderprogram>("../shader/cg/VertexShader.glsl", "../shader/cg/FragmentShader.glsl");
+		locs.vertex = shader->getAttribLocation("vertex");
+		locs.normal = shader->getAttribLocation("normal");
+		locs.modelViewProjection = shader->getUniformLocation("matrices.mvp");
+		locs.normalmatrix = shader->getUniformLocation("matrices.normal");
+		locs.modelview = shader->getUniformLocation("matrices.mv");
+		locs.lightPos = shader->getUniformLocation("light.lightPos");
+		// locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "toon");
+		// locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "red");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
@@ -106,40 +106,66 @@ namespace cgbv
 
 
 
-        // Geometrie
-        std::vector<glm::vec3> basevertices;
-        std::vector<glm::vec3> basenormals;
+		//// Geometrie
+		//std::vector<glm::vec3> basevertices;
+		//std::vector<glm::vec3> basenormals;
 
-        float step = 2.f * float(M_PI) / 32.f;
-        for(float f = 0; f <= 2.f * float(M_PI) + step; f += step)
-        {
-            float x = std::sin(f);
-            float z = std::cos(f);
-            basevertices.push_back(glm::vec3(x, 0.f, z));
-            basenormals.push_back(glm::vec3(x, std::sin(float(M_PI) / 12.6), z));
-        }
+		//float step = 2.f * float(M_PI) / 32.f;
+		//for(float f = 0; f <= 2.f * float(M_PI) + step; f += step)
+		//{
+		//    float x = std::sin(f);
+		//    float z = std::cos(f);
+		//    basevertices.push_back(glm::vec3(x, 0.f, z));
+		//    basenormals.push_back(glm::vec3(x, std::sin(float(M_PI) / 12.6), z));
+		//}
 
-        std::vector<float> data;
-        glm::vec3 top(0.f, 2.f, 0.f);
-        for(unsigned int i = 0; i < basevertices.size(); ++i)
-        {
-            int next = (i + 1 == basevertices.size()) ? 0 : i + 1;
+		//std::vector<float> data;
+		//glm::vec3 top(0.f, 2.f, 0.f);
+		//for(unsigned int i = 0; i < basevertices.size(); ++i)
+		//{
+		//    int next = (i + 1 == basevertices.size()) ? 0 : i + 1;
 
-            glm::vec3 topnormal = glm::normalize(basenormals[i] + basenormals[next]);
+		//    glm::vec3 topnormal = glm::normalize(basenormals[i] + basenormals[next]);
 
-            data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
-            data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
-            cone.vertsToDraw++;
+		//    data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
+		//    data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
+		//    cone.vertsToDraw++;
 
-            data.insert(std::end(data), glm::value_ptr(top), glm::value_ptr(top) + sizeof(glm::vec3) / sizeof(float));
-            data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
-            cone.vertsToDraw++;
+		//    data.insert(std::end(data), glm::value_ptr(top), glm::value_ptr(top) + sizeof(glm::vec3) / sizeof(float));
+		//    data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
+		//    cone.vertsToDraw++;
 
-            data.insert(std::end(data), glm::value_ptr(basevertices[next]), glm::value_ptr(basevertices[next]) + sizeof(glm::vec3) / sizeof(float));
-            data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
-            cone.vertsToDraw++;
-        }
+		//    data.insert(std::end(data), glm::value_ptr(basevertices[next]), glm::value_ptr(basevertices[next]) + sizeof(glm::vec3) / sizeof(float));
+		//    data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
+		//    cone.vertsToDraw++;
+		//}
 
+		// Geometrie
+		std::vector<glm::vec3> basevertices;
+		std::vector<glm::vec3> basenormals;
+
+		basevertices.push_back(glm::vec3(0.f, 0.f, 0.f));
+		basevertices.push_back(glm::vec3(1.f, 0.f, 0.f));
+		basevertices.push_back(glm::vec3(0.f, 1.f, 0.f));
+
+
+
+		std::vector<float> data;
+		
+
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[0]), glm::value_ptr(basevertices[0]) + sizeof(glm::vec3) / sizeof(float));
+
+		cone.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[1]), glm::value_ptr(basevertices[1]) + sizeof(glm::vec3) / sizeof(float));
+			
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(basevertices[2]), glm::value_ptr(basevertices[2]) + sizeof(glm::vec3) / sizeof(float));
+			
+			cone.vertsToDraw++;
+		
         glGenVertexArrays(1, &cone.vao);
         glBindVertexArray(cone.vao);
 
@@ -148,9 +174,9 @@ namespace cgbv
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(locs.vertex);
-        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
-        glEnableVertexAttribArray(locs.normal);
-        glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE,0, nullptr);
+       // glEnableVertexAttribArray(locs.normal);
+       // glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
 
 
 
