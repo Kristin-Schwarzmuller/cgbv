@@ -162,6 +162,7 @@ namespace cgbv
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "red");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 		std::vector<glm::vec3> basevertices;
+		std::vector<glm::vec3> topvertices;
 		//std::vector<glm::vec3> basenormals;
 
 		float step = 2.f * float(M_PI) / 32.f;
@@ -170,28 +171,70 @@ namespace cgbv
 		    float x = std::sin(f);
 		    float z = std::cos(f);
 		    basevertices.push_back(glm::vec3(x, 0.f, z));
+			topvertices.push_back(glm::vec3(x, 2.f, z));
 		    //basenormals.push_back(glm::vec3(0, 1, 0));
 		}
 
 		std::vector<float> data;
-		glm::vec3 top(0.f, 0.f, 0.f);
+		glm::vec3 baseCenter(0.f, 0.f, 0.f);
+		glm::vec3 topCenter(0.f, 2.f, 0.f);
 		for(unsigned int i = 0; i < basevertices.size(); ++i)
 		{
 		    int next = (i + 1 == basevertices.size()) ? 0 : i + 1;
-
-		    //glm::vec3 topnormal = glm::normalize(basenormals[i] + basenormals[next]);
+			// ---------- Boden ---------- 
+			//glm::vec3 topnormal = glm::vec3(0, 1, 0);
 
 		    data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
 		    //data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
 
-		    data.insert(std::end(data), glm::value_ptr(top), glm::value_ptr(top) + sizeof(glm::vec3) / sizeof(float));
+		    data.insert(std::end(data), glm::value_ptr(baseCenter), glm::value_ptr(baseCenter) + sizeof(glm::vec3) / sizeof(float));
 		    //data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
 
 		    data.insert(std::end(data), glm::value_ptr(basevertices[next]), glm::value_ptr(basevertices[next]) + sizeof(glm::vec3) / sizeof(float));
 		    //data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
+
+			// ---------- Deckel ---------- 
+			data.insert(std::end(data), glm::value_ptr(topvertices[i]), glm::value_ptr(topvertices[i]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormals[i]), glm::value_ptr(topnormals[i]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(topCenter), glm::value_ptr(topCenter) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(topvertices[next]), glm::value_ptr(topvertices[next]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormals[next]), glm::value_ptr(topnormals[next]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			// ---------- Seitendreiecke: Top - Base - Top ---------- 
+			data.insert(std::end(data), glm::value_ptr(topvertices[i]), glm::value_ptr(topvertices[i]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormals[i]), glm::value_ptr(topnormals[i]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(topvertices[next]), glm::value_ptr(topvertices[next]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormals[next]), glm::value_ptr(topnormals[next]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			// ---------- Seitendreiecke: Base - Top - Base ---------- 
+			data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(topvertices[next]), glm::value_ptr(topvertices[next]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
+			data.insert(std::end(data), glm::value_ptr(basevertices[next]), glm::value_ptr(basevertices[next]) + sizeof(glm::vec3) / sizeof(float));
+			//data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
+			cone.vertsToDraw++;
+
 		}
 		
         glGenVertexArrays(1, &cone.vao);
