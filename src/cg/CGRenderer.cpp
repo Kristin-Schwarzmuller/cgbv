@@ -159,8 +159,10 @@ namespace cgbv
 
 
 		// Kreis
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "red");
+		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 		std::vector<glm::vec3> basevertices;
-		std::vector<glm::vec3> basenormals;
+		//std::vector<glm::vec3> basenormals;
 
 		float step = 2.f * float(M_PI) / 32.f;
 		for(float f = 0; f <= 2.f * float(M_PI) + step; f += step)
@@ -168,7 +170,7 @@ namespace cgbv
 		    float x = std::sin(f);
 		    float z = std::cos(f);
 		    basevertices.push_back(glm::vec3(x, 0.f, z));
-		    basenormals.push_back(glm::vec3(0, 1, 0));
+		    //basenormals.push_back(glm::vec3(0, 1, 0));
 		}
 
 		std::vector<float> data;
@@ -177,18 +179,18 @@ namespace cgbv
 		{
 		    int next = (i + 1 == basevertices.size()) ? 0 : i + 1;
 
-		    glm::vec3 topnormal = glm::normalize(basenormals[i] + basenormals[next]);
+		    //glm::vec3 topnormal = glm::normalize(basenormals[i] + basenormals[next]);
 
 		    data.insert(std::end(data), glm::value_ptr(basevertices[i]), glm::value_ptr(basevertices[i]) + sizeof(glm::vec3) / sizeof(float));
-		    data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
+		    //data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
 
 		    data.insert(std::end(data), glm::value_ptr(top), glm::value_ptr(top) + sizeof(glm::vec3) / sizeof(float));
-		    data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
+		    //data.insert(std::end(data), glm::value_ptr(topnormal), glm::value_ptr(topnormal) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
 
 		    data.insert(std::end(data), glm::value_ptr(basevertices[next]), glm::value_ptr(basevertices[next]) + sizeof(glm::vec3) / sizeof(float));
-		    data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
+		    //data.insert(std::end(data), glm::value_ptr(basenormals[next]), glm::value_ptr(basenormals[next]) + sizeof(glm::vec3) / sizeof(float));
 		    cone.vertsToDraw++;
 		}
 		
@@ -202,8 +204,8 @@ namespace cgbv
         glEnableVertexAttribArray(locs.vertex);
         glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE,0, nullptr);
 		// folgenden zwei Zeilen bei Dreieck auskommentieren!!
-        glEnableVertexAttribArray(locs.normal);
-        glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+        //glEnableVertexAttribArray(locs.normal);
+        //glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
 
 
 
