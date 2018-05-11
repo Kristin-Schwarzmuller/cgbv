@@ -115,11 +115,19 @@ layout (index = 0) subroutine (FragmentProgram) void toon()
     out_color = toon * vec4((Input.normal * .5f) + .5f, 1);
 }
 
-// Subroutine Implementation
+// Subroutine einfarbing Rot
 // =============================================================================================================
 layout (index = 1) subroutine (FragmentProgram) void red()
 {
 
     out_color = vec4(1,0,0,1);
+}
+// Subroutine ändern mit Parameter
+// =============================================================================================================
+layout (index = 2) subroutine (FragmentProgram) void changeByParam()
+{
+
+    //out_color = vec4(Input.lightDir.xyz,1);
+	out_color = vec4((Input.normal * .5f) + .5f, 1);
 }
 // =============================================================================================================
