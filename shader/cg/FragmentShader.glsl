@@ -47,7 +47,7 @@ subroutine void FragmentProgram();
 
 // Variables
 // =============================================================================================================
-layout(location = 0) flat in FragmentInput Input;
+layout(location = 0) in FragmentInput Input;
 
 uniform Matrices matrices;
 

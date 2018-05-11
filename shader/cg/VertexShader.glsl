@@ -49,7 +49,7 @@ uniform Light light;
 
 subroutine uniform VertexProgram vertexprogram;
 
-layout(location = 0) flat out VertexOutput Output;
+layout(location = 0) out VertexOutput Output;
 // =============================================================================================================
 
 
@@ -87,7 +87,7 @@ subroutine (VertexProgram) void simpleTrans()
 {
     gl_Position = matrices.mvp * vertex;
 
-	 Output.normal = matrices.normal * normal;
+	Output.normal = matrices.normal * normal;
 
 	vec4 h = matrices.mv * vertex;
     vec3 mvPos = h.xyz / h.w;
