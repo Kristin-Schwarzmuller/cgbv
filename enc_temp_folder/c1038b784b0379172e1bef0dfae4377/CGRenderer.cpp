@@ -448,7 +448,6 @@ namespace cgbv
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		std::vector<glm::vec3> basevertices;
 		int tessDepth = 0;
-		std::vector<float> data;
 
 		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
 		basevertices.push_back(glm::vec3(1.f, 1.f, 1.f));
@@ -474,31 +473,34 @@ namespace cgbv
 							/*Deckel:*/					5, 4, 1,
 														4, 1, 0 };
 
-		//-------------------------------Würfel------------------------------
-		//for (unsigned int i = 0; i < 36 * (tessDepth + 1); ++i)
-		//{
-		//	//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i % 36]]), glm::value_ptr(basevertices[indices[i % 36]]) + sizeof(glm::vec3) / sizeof(float));
-		//	// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i % 36]]), glm::value_ptr(basevertices[indices[i % 36]]) + sizeof(glm::vec3) / sizeof(float));
-		//	cone.vertsToDraw++;
-		//}
-		// Tessilieren der Dreiecke
-		std::vector<glm::vec3> verticesToTessilate;
-		for (unsigned int i = 0; i < 36; ++i)
-		{
-			verticesToTessilate.push_back(basevertices[indices[i]]);
-		}
-		std::vector<glm::vec3> verticesTessilated = tessellate(verticesToTessilate, tessDepth);	
+		std::vector<float> data;
 
-		for (unsigned int i = 0; i < 36 * (tessDepth+1); ++i)
+		for (unsigned int i = 0; i < 36 * (tessDepth + 1); ++i)
 		{
 			//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
-			data.insert(std::end(data), glm::value_ptr(verticesTessilated[indices[i%36]]), glm::value_ptr(verticesTessilated[indices[i%36]]) + sizeof(glm::vec3) / sizeof(float));
+			data.insert(std::end(data), glm::value_ptr(basevertices[indices[i % 36]]), glm::value_ptr(basevertices[indices[i % 36]]) + sizeof(glm::vec3) / sizeof(float));
 			// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-			data.insert(std::end(data), glm::value_ptr(verticesTessilated[indices[i%36]]), glm::value_ptr(verticesTessilated[indices[i%36]]) + sizeof(glm::vec3) / sizeof(float));
+			data.insert(std::end(data), glm::value_ptr(basevertices[indices[i % 36]]), glm::value_ptr(basevertices[indices[i % 36]]) + sizeof(glm::vec3) / sizeof(float));
 			cone.vertsToDraw++;
 		}
+		//// Tessilieren der Dreiecke
+		//std::vector<glm::vec3> verticesToTessilate;
+		//for (unsigned int i = 0; i < 36; ++i)
+		//{
+		//	verticesToTessilate.push_back(basevertices[indices[i]]);
+		//}
+		//std::vector<glm::vec3> verticesTessilated = tessellate(verticesToTessilate, tessDepth);
+
+		//std::vector<float> data;	
+
+		//for (unsigned int i = 0; i < 36 * (tessDepth+1); ++i)
+		//{
+		//	//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
+		//	data.insert(std::end(data), glm::value_ptr(verticesTessilated[indices[i%36]]), glm::value_ptr(verticesTessilated[indices[i%36]]) + sizeof(glm::vec3) / sizeof(float));
+		//	// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
+		//	data.insert(std::end(data), glm::value_ptr(verticesTessilated[indices[i%36]]), glm::value_ptr(verticesTessilated[indices[i%36]]) + sizeof(glm::vec3) / sizeof(float));
+		//	cone.vertsToDraw++;
+		//}
 
 		glGenVertexArrays(1, &cone.vao);
 		glBindVertexArray(cone.vao);
