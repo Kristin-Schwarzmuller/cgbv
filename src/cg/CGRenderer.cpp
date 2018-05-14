@@ -69,6 +69,7 @@ namespace cgbv
 	/** Rekursive Funtion zum tesselieren von Dreiecken
 	* input: vertices: Vektor mit 3dim Vertices,
 	* input: depth: Anzahl der Tesselierungstiefen 0 = keine --> Abbruchbedingung
+	* output: vector, indem jedes Dreieck druch 4 neue Dreiecke ersetzt wird
 	*/
 	std::vector<glm::vec3> CGRenderer::tessellate(std::vector<glm::vec3> vertices, int depth)
 	{
@@ -88,9 +89,12 @@ namespace cgbv
 			glm::vec3 c = vertices[i+2];
 
 			// Berechnen der Zwischenpunkte
-			glm::vec3 b2 = a + (c - a) * 0.5f;
-			glm::vec3 c2 = a + (b - a) * 0.5f;
-			glm::vec3 a2 = c + (b - c) * 0.5f;
+			glm::vec3 b2 = (a + (c - a) * 0.5f);
+			b2 = b2 / glm::length(b2)*(glm::length(glm::vec3(1, 1, 1)));
+			glm::vec3 c2 = (a + (b - a) * 0.5f);
+			c2 = c2 / glm::length(c2)*(glm::length(glm::vec3(1, 1, 1)));
+			glm::vec3 a2 = (c + (b - c) * 0.5f);
+			a2 = a2 / glm::length(a2)*(glm::length(glm::vec3(1, 1, 1)));
 
 			// Zurück schreiben ins Ausgabearray
 			verticesExtended.push_back(a);
@@ -111,61 +115,6 @@ namespace cgbv
 		}
 		// Rekursiver Aufruf --> wenn depth dann noch großer 0 --> weiter
 		return tessellate(verticesExtended, --depth);
-	}
-
-	std::vector<glm::vec3> CGRenderer::tessellate2(std::vector<glm::vec3> vertices, int depth)
-	{
-		// Ende der Tesselierungstiefe erreicht? 
-		if (depth == 0) return vertices;
-
-		// Unterteilung jedes Dreiecks in vier neue Dreiecke: Aus je 3 Vertices werden 12
-		std::vector<glm::vec3> verticesExtended;
-
-		/* So lange min 3 Vertices sich noch im Eingabevector befinden,
-		* werden aus diesen drei Punken, drei Punkte zwischen drin berechnet.
-		* Daraus resultierend, werden die neuen 4 Dreiecke berechnet und in korreter Reihenfolge ins ausgabe Array geschrieben*/
-		for (unsigned int i = 0; i <= vertices.size() - 6; i += 6) {
-			// Auslesen der nächsten drei Punkte
-			glm::vec3 a = vertices[i];
-			glm::vec3 b = vertices[i + 2];
-			glm::vec3 c = vertices[i + 4];
-
-			// Berechnen der Zwischenpunkte
-			glm::vec3 b2 = a + (c - a) * 0.5f;
-			glm::vec3 c2 = a + (b - a) * 0.5f;
-			glm::vec3 a2 = c + (b - c) * 0.5f;
-
-			// Zurück schreiben ins Ausgabearray
-			verticesExtended.push_back(a);
-			verticesExtended.push_back(glm::normalize(a));
-			verticesExtended.push_back(b2);
-			verticesExtended.push_back(glm::normalize(b2));
-			verticesExtended.push_back(c2);
-			verticesExtended.push_back(glm::normalize(c2));
-
-			verticesExtended.push_back(b2);
-			verticesExtended.push_back(glm::normalize(b2));
-			verticesExtended.push_back(c);
-			verticesExtended.push_back(glm::normalize(c));
-			verticesExtended.push_back(a2);
-			verticesExtended.push_back(glm::normalize(a2));
-
-			verticesExtended.push_back(a2);
-			verticesExtended.push_back(glm::normalize(a2));
-			verticesExtended.push_back(b);
-			verticesExtended.push_back(glm::normalize(b));
-			verticesExtended.push_back(c2);
-			verticesExtended.push_back(glm::normalize(c2));
-
-			verticesExtended.push_back(a2);
-			verticesExtended.push_back(glm::normalize(a2));
-			verticesExtended.push_back(c2);
-			verticesExtended.push_back(glm::normalize(c2));
-			verticesExtended.push_back(b2);
-			verticesExtended.push_back(glm::normalize(b2));
-		}
-		// Rekursiver Aufruf --> wenn depth dann noch großer 0 --> weiter
-		return tessellate2(verticesExtended, --depth);
 	}
 
 
@@ -393,7 +342,7 @@ namespace cgbv
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		std::vector<glm::vec3> basevertices;
-		int tessDepth = 3;
+		int tessDepth = 0;//Input.lightDir.x;
 		std::vector<float> data;
 
 		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
@@ -436,14 +385,14 @@ namespace cgbv
 		{
 			verticesToTessilate.push_back(basevertices[indices[i]]);
 		}
-		std::vector<glm::vec3> verticesTessilated = tessellate2(verticesToTessilate, tessDepth);	
+		std::vector<glm::vec3> verticesTessilated = tessellate(verticesToTessilate, tessDepth);	
 
 		for (unsigned int i = 0; i < verticesTessilated.size(); ++i)
 		{
 			// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
 			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
 			// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-			//data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
+			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
 			cone.vertsToDraw++;
 		}
 
