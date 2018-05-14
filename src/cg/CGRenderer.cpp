@@ -201,7 +201,7 @@ namespace cgbv
 
 		//-------------------------------------------------------------------------------------------------------------------------------
 		// Dreieck
-		/*locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 
 		std::vector<glm::vec3> basevertices;
@@ -238,9 +238,9 @@ namespace cgbv
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(locs.vertex);
-        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6 , nullptr);*/
-		//glEnableVertexAttribArray(locs.normal);
-		//glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6 , nullptr);
+		glEnableVertexAttribArray(locs.normal);
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
 
 		//-------------------------------------------------------------------------------------------------------------------------------
 		 //Zylinder
@@ -337,76 +337,76 @@ namespace cgbv
 		//glEnableVertexAttribArray(locs.normal);
 		//glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
 
-		//////-------------------------------------------------------------------------------------------------------------------------------
-		// Würfel
-		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
-		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
-		std::vector<glm::vec3> basevertices;
-		int tessDepth = 0;//Input.lightDir.x;
-		std::vector<float> data;
+		////////-------------------------------------------------------------------------------------------------------------------------------
+		//// Würfel bei tessDepth = 0 und bei tessDepth >= 1 Kugel
+		//locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
+		//locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+		//std::vector<glm::vec3> basevertices;
+		//int tessDepth = 2;//Input.lightDir.x;
+		//std::vector<float> data;
 
-		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
-		basevertices.push_back(glm::vec3(1.f, 1.f, 1.f));
-		basevertices.push_back(glm::vec3(1.f, -1.f, 1.f));
-		basevertices.push_back(glm::vec3(-1.f, -1.f, 1.f));
-		
-		basevertices.push_back(glm::vec3(-1.f, 1.f, -1.f));
-		basevertices.push_back(glm::vec3(1.f, 1.f, -1.f));
-		basevertices.push_back(glm::vec3(1.f, -1.f, -1.f));
-		basevertices.push_back(glm::vec3(-1.f, -1.f, -1.f));
+		//basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
+		//basevertices.push_back(glm::vec3(1.f, 1.f, 1.f));
+		//basevertices.push_back(glm::vec3(1.f, -1.f, 1.f));
+		//basevertices.push_back(glm::vec3(-1.f, -1.f, 1.f));
+		//
+		//basevertices.push_back(glm::vec3(-1.f, 1.f, -1.f));
+		//basevertices.push_back(glm::vec3(1.f, 1.f, -1.f));
+		//basevertices.push_back(glm::vec3(1.f, -1.f, -1.f));
+		//basevertices.push_back(glm::vec3(-1.f, -1.f, -1.f));
 
-		// Reihenfolge inder die Dreiecke reihum gezeichnet werden sollen --> siehe Buch 107
-		int indices[] = {	/*Boden:*/					2, 3, 6,
-														3, 6, 7,
-							/*Rueckseite links unten:*/	6, 7, 4,
-							/*linke Seite:*/			7, 4, 3,
-														4, 3, 0,
-							/* Vorderseite:*/			3, 0, 2,
-														0, 2, 1,
-							/*rechte Seite:*/			2, 1, 6,
-														1, 6, 5,
-							/*Rueckseite rechts unten:*/6, 5, 4,
-							/*Deckel:*/					5, 4, 1,
-														4, 1, 0 };
+		//// Reihenfolge inder die Dreiecke reihum gezeichnet werden sollen --> siehe Buch 107
+		//int indices[] = {	/*Boden:*/					2, 3, 6,
+		//												3, 6, 7,
+		//					/*Rueckseite links unten:*/	6, 7, 4,
+		//					/*linke Seite:*/			7, 4, 3,
+		//												4, 3, 0,
+		//					/* Vorderseite:*/			3, 0, 2,
+		//												0, 2, 1,
+		//					/*rechte Seite:*/			2, 1, 6,
+		//												1, 6, 5,
+		//					/*Rueckseite rechts unten:*/6, 5, 4,
+		//					/*Deckel:*/					5, 4, 1,
+		//												4, 1, 0 };
 
-		//-------------------------------Würfel------------------------------
-		//for (unsigned int i = 0; i < 36 ; ++i)
+		////-------------------------------Würfel------------------------------
+		////for (unsigned int i = 0; i < 36 ; ++i)
+		////{
+		////	//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
+		////	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
+		////	// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
+		////	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
+		////	cone.vertsToDraw++;
+		////}
+		//// //------------------------------- Kugel -------------------------------
+		//// Tessilieren der Dreiecke
+		//std::vector<glm::vec3> verticesToTessilate;
+		//for (unsigned int i = 0; i < 36; ++i)
 		//{
-		//	//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
+		//	verticesToTessilate.push_back(basevertices[indices[i]]);
+		//}
+		//std::vector<glm::vec3> verticesTessilated = tessellate(verticesToTessilate, tessDepth);	
+
+		//for (unsigned int i = 0; i < verticesTessilated.size(); ++i)
+		//{
+		//	// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
+		//	data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
 		//	// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
+		//	data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
 		//	cone.vertsToDraw++;
 		//}
-		// //------------------------------- Kugel -------------------------------
-		// Tessilieren der Dreiecke
-		std::vector<glm::vec3> verticesToTessilate;
-		for (unsigned int i = 0; i < 36; ++i)
-		{
-			verticesToTessilate.push_back(basevertices[indices[i]]);
-		}
-		std::vector<glm::vec3> verticesTessilated = tessellate(verticesToTessilate, tessDepth);	
 
-		for (unsigned int i = 0; i < verticesTessilated.size(); ++i)
-		{
-			// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
-			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
-			// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
-			cone.vertsToDraw++;
-		}
+		//glGenVertexArrays(1, &cone.vao);
+		//glBindVertexArray(cone.vao);
 
-		glGenVertexArrays(1, &cone.vao);
-		glBindVertexArray(cone.vao);
+		//glGenBuffers(1, &cone.vbo);
+		//glBindBuffer(GL_ARRAY_BUFFER, cone.vbo);
+		//glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
-		glGenBuffers(1, &cone.vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, cone.vbo);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(locs.vertex);
-		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 /* Ein zu betrachtenter Punkt besteht aus 6 float Werten*/, nullptr);
-		glEnableVertexAttribArray(locs.normal);
-		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
+		//glEnableVertexAttribArray(locs.vertex);
+		//glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 /* Ein zu betrachtenter Punkt besteht aus 6 float Werten*/, nullptr);
+		//glEnableVertexAttribArray(locs.normal);
+		//glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
 
 
 		////-----------------------------------------------------
