@@ -127,7 +127,7 @@ layout (index = 1) subroutine (FragmentProgram) void red()
 layout (index = 2) subroutine (FragmentProgram) void changeByParam()
 {
 
-    //out_color = vec4(Input.lightDir.xyz,1);
+    out_color = vec4(Input.lightDir.xyz,1);
 	out_color = vec4((Input.normal * .5f) + .5f, 1);
 }
 // =============================================================================================================
