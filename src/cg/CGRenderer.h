@@ -62,6 +62,7 @@ namespace cgbv
 		virtual void resize(int width, int height);
 		virtual void input(int key, int scancode, int action, int modifiers);
 		std::vector<glm::vec3> tessellate(std::vector<glm::vec3>, int depth);
+		std::vector<glm::vec3> tessellate2(std::vector<glm::vec3> vertices, int depth);
 		virtual bool setup();
 		virtual void render();
 		virtual void update();
