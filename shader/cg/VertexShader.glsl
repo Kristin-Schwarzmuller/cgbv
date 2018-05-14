@@ -87,7 +87,7 @@ subroutine (VertexProgram) void simpleTrans()
 {
     gl_Position = matrices.mvp * vertex;
 
-	 Output.normal = matrices.normal * normal;
+	Output.normal = matrices.normal * normal;
 
 	vec4 h = matrices.mv * vertex;
     vec3 mvPos = h.xyz / h.w;
