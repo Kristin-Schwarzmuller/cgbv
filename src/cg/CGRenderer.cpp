@@ -341,7 +341,9 @@ namespace cgbv
 		//// Würfel bei tessDepth = 0 und bei tessDepth >= 1 Kugel
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
 		std::vector<glm::vec3> basevertices;
+		std::vector<glm::vec3> basenormals;
 		int tessDepth = 2;//Input.lightDir.x;
 		std::vector<float> data;
 
@@ -381,10 +383,12 @@ namespace cgbv
 
 		for (unsigned int i = 0; i < verticesTessilated.size(); ++i)
 		{
+			// Einfügen der normaisierten Normalenvekoren, sodass nicht größer als 1
+			basenormals.push_back(glm::normalize(verticesTessilated[i]));
 			// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
 			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
 			// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-			data.insert(std::end(data), glm::value_ptr(verticesTessilated[i]), glm::value_ptr(verticesTessilated[i]) + sizeof(glm::vec3) / sizeof(float));
+			data.insert(std::end(data), glm::value_ptr(basenormals[i]), glm::value_ptr(basenormals[i]) + sizeof(glm::vec3) / sizeof(float));
 			cone.vertsToDraw++;
 		}
 

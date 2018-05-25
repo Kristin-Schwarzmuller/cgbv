@@ -127,7 +127,57 @@ layout (index = 1) subroutine (FragmentProgram) void red()
 layout (index = 2) subroutine (FragmentProgram) void changeByParam()
 {
 
-    out_color = vec4(Input.lightDir.xyz,1);
+    //out_color = vec4(Input.lightDir.xyz,1);
 	out_color = vec4((Input.normal * .5f) + .5f, 1);
 }
 // =============================================================================================================
+layout (index = 3) subroutine (FragmentProgram) void phong()
+{
+	// Source: https://de.wikipedia.org/wiki/Phong-Beleuchtungsmodell
+
+	// ambient: =========================== 
+	/* unabh.: Einfallswinkel des Lichtstrahls der Punktlichtquelle 
+	* unabhh.: Blickwinkel des Beobachters 
+	* abh.: konstanten Umgebungslicht 
+	* abh.: empirisch bestimmten Reflexionsfaktor (Materialkonstante). 
+	* I_ambient = I_a * k_ambient */
+
+	vec4 I_a = vec4(1, 1, 1, 1);
+	vec4 k_ambient = vec4(.3f);
+
+	vec4 out_ambient = I_a * k_ambient;
+	
+	// diffus: ===========================
+	/* unabh.: Standpunkt des Betrachters in alle Richtungen reflektiert (Lambertsches Gesetz)
+	* abh: Einfallswinkel des reflektierten Lichts 
+	* abh.: empirisch bestimmten Reflexionsfaktor (Materialkonstante) 
+	* I_diffus = I_in * k_diffus * (normalenVektor * einhVekLicht) */
+
+	 vec4 I_in = vec4(1, 1, 1, 1);
+	 vec4 k_diffus = vec4(0, 0, 1, 1);
+
+	vec4 out_diffus =  I_in * k_diffus * dot(Input.lightDir.normalize, Input.normal); // beide noch zu normierene mit normalize
+
+	// specular: ===========================
+	/* abh.: Einfallswinkel des Lichtstrahls der Punktlichtquelle
+	* abh.: empirisch bestimmten Reflexionsfaktor (Materialkonstante)
+	* abh.: Oberflächenbeschaffenheit
+	* abh.: Blickwinkel des Beobachters
+	* I_specular = I_in * k_specular * (Reflexionsrichtung * Blickrichtung)^ Oberflächenbeschaffenheit */
+	
+	I_in = vec4(1, 1, 1, 1);
+	vec4 k_specular = vec4(1, 0, 0, 1);;
+	//Oberflächenbeschaffenheit (rau kleiner 32, glatt größer 32, {\displaystyle n=\infty } n=\infty  wäre ein perfekter Spiegel)
+	float n = 32.0f; 
+	//Normalisierungsfaktor
+	float n_fac = (n + 2.0f) / (2.0f * 3.14f);
+
+	//Reflexionsrichtung des ausfallenden Lichtstrahls
+	//vec4 R = vec4();
+	// Blickrichtung des Betrachters
+	//vec4 V = ()
+
+	//vec4 out_specular = I_in * k_specular * n_fac * pow(dot(R, V), n)
+
+	out_color = out_ambient + out_diffus; // + out_specular;
+}
