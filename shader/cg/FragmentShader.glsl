@@ -1,6 +1,11 @@
 #version 430 // change later
 
+// Eingabe-Werte pro Vertex
+in vec4 vVertex; // Vertex-Position in Objektkoordinaten
 
+// Uniform-Eingabe-Werte
+uniform mat4 MV; // ModelView-Matrix
+uniform mat3 NormalM; // Normalen-Matrix
 
 // Structures
 // =============================================================================================================
@@ -133,7 +138,7 @@ layout (index = 2) subroutine (FragmentProgram) void changeByParam()
 // =============================================================================================================
 layout (index = 3) subroutine (FragmentProgram) void phong()
 {
-	// Source: https://de.wikipedia.org/wiki/Phong-Beleuchtungsmodell
+	// Source: Buch Seite 234 und https://de.wikipedia.org/wiki/Phong-Beleuchtungsmodell
 
 	// ambient: =========================== 
 	/* unabh.: Einfallswinkel des Lichtstrahls der Punktlichtquelle 
@@ -142,7 +147,7 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 	* abh.: empirisch bestimmten Reflexionsfaktor (Materialkonstante). 
 	* I_ambient = I_a * k_ambient */
 
-	vec4 I_a = vec4(1, 1, 1, 1);
+	vec4 I_a = vec4(1, 0, 1, 1);
 	vec4 k_ambient = vec4(.3f);
 
 	vec4 out_ambient = I_a * k_ambient;
@@ -156,7 +161,7 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 	 vec4 I_in = vec4(1, 1, 1, 1);
 	 vec4 k_diffus = vec4(0, 0, 1, 1);
 
-	vec4 out_diffus =  I_in * k_diffus * dot(Input.lightDir.normalize, Input.normal); // beide noch zu normierene mit normalize
+	vec4 out_diffus =  I_in * k_diffus * max(dot(normalize(Input.lightDir), normalize(Input.normal)), .0f); // beide noch zu normierene mit normalize
 
 	// specular: ===========================
 	/* abh.: Einfallswinkel des Lichtstrahls der Punktlichtquelle
@@ -165,19 +170,26 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 	* abh.: Blickwinkel des Beobachters
 	* I_specular = I_in * k_specular * (Reflexionsrichtung * Blickrichtung)^ Oberflächenbeschaffenheit */
 	
-	I_in = vec4(1, 1, 1, 1);
-	vec4 k_specular = vec4(1, 0, 0, 1);;
-	//Oberflächenbeschaffenheit (rau kleiner 32, glatt größer 32, {\displaystyle n=\infty } n=\infty  wäre ein perfekter Spiegel)
-	float n = 32.0f; 
+	I_in = vec4(0, 1, 0, 1);
+	vec4 k_specular = vec4(1, 1, 0, 1);
+	vec4 out_specular = vec4(.0f);
+
+	//Oberflächenbeschaffenheit (rau kleiner 32, glatt größer 32, n=unenhdlich  wäre ein perfekter Spiegel)
+	float shininess = 32.0f; 
 	//Normalisierungsfaktor
-	float n_fac = (n + 2.0f) / (2.0f * 3.14f);
+	float n_fac = (shininess + 2.0f) / (2.0f * 3.14f);
 
-	//Reflexionsrichtung des ausfallenden Lichtstrahls
-	//vec4 R = vec4();
-	// Blickrichtung des Betrachters
-	//vec4 V = ()
+	// Richtungslichtquelle
+	vec3 L = normalize(Input.lightDir);
+	// Normalen-Vektor aus Objekt- in Augenpunktskoordinaten
+	vec3 N = NormalM *  normalize(Input.normal);
+	?oat diffuseLight = max(dot(N, L), 0.0);
+	// Augenpunktsvektor A Siehe PDF Seite 346, keine Ahnung welche Buchseite
+	vec3 A = normalize(vec3(.0f, 0.f, 1.f));
+	// Halfway-Vektor: h = (l + a)/ | l + a | mit Augenpunktsvektor a und Lichtvetor l, siehe Buch S. 232
+	vec3 H = normalize((L + A)/ abs(L + A ));
 
-	//vec4 out_specular = I_in * k_specular * n_fac * pow(dot(R, V), n)
+	out_specular = I_in * k_specular * n_fac * pow(max(dot(H, N), 0), shininess);
 
-	out_color = out_ambient + out_diffus; // + out_specular;
+	out_color = out_ambient + out_diffus + out_specular;
 }
