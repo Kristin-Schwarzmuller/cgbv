@@ -343,7 +343,7 @@ namespace cgbv
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
 		std::vector<glm::vec3> basevertices;
-		int tessDepth = 2;//Input.lightDir.x;
+		int tessDepth = 5;//Input.lightDir.x;
 		std::vector<float> data;
 
 		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
