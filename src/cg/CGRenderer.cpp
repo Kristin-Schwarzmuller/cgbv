@@ -201,15 +201,23 @@ namespace cgbv
 
 		//-------------------------------------------------------------------------------------------------------------------------------
 		// Dreieck
-		/*locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 
 		std::vector<glm::vec3> basevertices;
 		std::vector<glm::vec3> basenormals;
 
-		basevertices.push_back(glm::vec3(0.f, 0.f, 0.f));
-		basevertices.push_back(glm::vec3(1.f, 0.f, 0.f));
-		basevertices.push_back(glm::vec3(0.f, 1.f, 0.f));
+		basevertices.push_back(glm::vec3(-0.5f, -0.5f, 0.f));
+		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+
+		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basevertices.push_back(glm::vec3(0.5f, 0.5f, 0.f));
+
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
 
 		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
 		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
@@ -220,14 +228,68 @@ namespace cgbv
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[0]), glm::value_ptr(basevertices[0]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[0]), glm::value_ptr(basenormals[0]) + sizeof(glm::vec3) / sizeof(float));
-		cone.vertsToDraw++;
+		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[1]), glm::value_ptr(basevertices[1]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[1]), glm::value_ptr(basenormals[1]) + sizeof(glm::vec3) / sizeof(float));
-		cone.vertsToDraw++;
+		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[2]), glm::value_ptr(basevertices[2]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[2]), glm::value_ptr(basenormals[2]) + sizeof(glm::vec3) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[3]), glm::value_ptr(basevertices[3]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[3]), glm::value_ptr(basenormals[3]) + sizeof(glm::vec3) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[4]), glm::value_ptr(basevertices[4]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[4]), glm::value_ptr(basenormals[4]) + sizeof(glm::vec3) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[5]), glm::value_ptr(basevertices[5]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[5]), glm::value_ptr(basenormals[5]) + sizeof(glm::vec3) / sizeof(float));
+		disk.vertsToDraw++;
+
+		glGenVertexArrays(1, &disk.vao);
+		glBindVertexArray(disk.vao);
+
+		glGenBuffers(1, &disk.vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, disk.vbo);
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(locs.vertex);
+        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6 , nullptr);
+		glEnableVertexAttribArray(locs.normal);
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+
+// Code Elisa
+	/*	locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
+		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
+
+		std::vector<glm::vec3> basevertices2;
+		std::vector<glm::vec3> basenormals2;
+
+		basevertices2.push_back(glm::vec3(1.f, 0.f, 0.f));
+		basevertices2.push_back(glm::vec3(0.f, 1.f, 0.f));
+		basevertices2.push_back(glm::vec3(1.f, 1.f, 0.f));
+
+		basenormals2.push_back(glm::vec3(0.f, 0.f, 1.f));
+		basenormals2.push_back(glm::vec3(0.f, 0.f, 1.f));
+		basenormals2.push_back(glm::vec3(0.f, 0.f, 1.f));
+
+
+		std::vector<float> data;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices2[0]), glm::value_ptr(basevertices2[0]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals2[0]), glm::value_ptr(basenormals2[0]) + sizeof(glm::vec3) / sizeof(float));
+		cone.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices2[1]), glm::value_ptr(basevertices2[1]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals2[1]), glm::value_ptr(basenormals2[1]) + sizeof(glm::vec3) / sizeof(float));
+		cone.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices2[2]), glm::value_ptr(basevertices2[2]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals2[2]), glm::value_ptr(basenormals2[2]) + sizeof(glm::vec3) / sizeof(float));
 		cone.vertsToDraw++;
 
 		glGenVertexArrays(1, &cone.vao);
@@ -238,9 +300,9 @@ namespace cgbv
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(locs.vertex);
-		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6 , nullptr);
+		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, nullptr);
 		glEnableVertexAttribArray(locs.normal);
-		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));*/
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));*/
 
 		//-------------------------------------------------------------------------------------------------------------------------------
 		//Zylinder
@@ -337,15 +399,16 @@ namespace cgbv
 		//glEnableVertexAttribArray(locs.normal);
 		//glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
 
-		//////-------------------------------------------------------------------------------------------------------------------------------
-		// Würfel
-
+		////////-------------------------------------------------------------------------------------------------------------------------------
+		//// Würfel bei tessDepth = 0 und bei tessDepth >= 1 Kugel
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
-		std::vector<glm::vec3> basevertices;
-		int tessDepth = 6;//Input.lightDir.x;
-		std::vector<float> data;
-
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
+		//std::vector<glm::vec3> basevertices;
+		basevertices.clear();
+		int tessDepth = 5;//Input.lightDir.x;
+		//std::vector<float> data;
+		data.clear();
 
 		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
 		basevertices.push_back(glm::vec3(1.f, 1.f, 1.f));
@@ -359,30 +422,21 @@ namespace cgbv
 
 		// Reihenfolge inder die Dreiecke reihum gezeichnet werden sollen --> siehe Buch 107
 		int indices[] = {	/*Boden:*/					2, 3, 6,
-			3, 6, 7,
-			/*Rueckseite links unten:*/	6, 7, 4,
-			/*linke Seite:*/			7, 4, 3,
-			4, 3, 0,
-			/* Vorderseite:*/			3, 0, 2,
-			0, 2, 1,
-			/*rechte Seite:*/			2, 1, 6,
-			1, 6, 5,
-			/*Rueckseite rechts unten:*/6, 5, 4,
-			/*Deckel:*/					5, 4, 1,
-			4, 1, 0 };
 
-		////-------------------------------Würfel------------------------------
-		//for (unsigned int i = 0; i < 36 ; ++i)
-		//{
-		//	//// ---------- Einfügen der Punkte nach den Indizes, wie sie im Array indices auftauchen, nach dieser Reihenfolge, werden die Dreiecke reihum gezeichnet ---------- 
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
-		//	// Erneutes Einfügen des gleichen Vektors, um den Normalen Vektor hinzuzufügen
-		//	data.insert(std::end(data), glm::value_ptr(basevertices[indices[i]]), glm::value_ptr(basevertices[indices[i]]) + sizeof(glm::vec3) / sizeof(float));
-		//	cone.vertsToDraw++;
-		//}
+														3, 6, 7,
+							/*Rueckseite links unten:*/	6, 7, 4,
+							/*linke Seite:*/			7, 4, 3,
+														4, 3, 0,
+							/* Vorderseite:*/			3, 0, 2,
+														0, 2, 1,
+							/*rechte Seite:*/			2, 1, 6,
+														1, 6, 5,
+							/*Rueckseite rechts unten:*/6, 5, 4,
+							/*Deckel:*/					5, 4, 1,
+														4, 1, 0 };
+
 		// //------------------------------- Kugel -------------------------------
 		// Tessilieren der Dreiecke
-
 		std::vector<glm::vec3> verticesToTessilate;
 		for (unsigned int i = 0; i < 36; ++i)
 		{
@@ -436,7 +490,7 @@ namespace cgbv
 
 
 		model = glm::mat4_cast(parameter.globalRotation);
-
+		model *= glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f));
 
 		shader->use();
 		normal = glm::transpose(glm::inverse(view * model));
@@ -450,7 +504,17 @@ namespace cgbv
 
 		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &locs.subFragment);
+		//Rechteck
 
+		glBindVertexArray(disk.vao);
+		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
+		//Kugel
+		model = glm::mat4_cast(parameter.globalRotation);
+		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.4f, 0.4f, 0.4f));
+		normal = glm::transpose(glm::inverse(view * model));
+		glUniformMatrix4fv(locs.modelViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view * model));
+		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));
+		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
 		glBindVertexArray(cone.vao);
 		glDrawArrays(GL_TRIANGLES, 0, cone.vertsToDraw);
 
