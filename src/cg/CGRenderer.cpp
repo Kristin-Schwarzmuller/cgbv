@@ -147,6 +147,16 @@ namespace cgbv
 		locs.normalmatrix = shader->getUniformLocation("matrices.normal");
 		locs.modelview = shader->getUniformLocation("matrices.mv");
 		locs.lightPos = shader->getUniformLocation("light.lightPos");
+		locs.ambientLight = shader->getUniformLocation("light.ambient");
+		locs.ambientMaterial = shader->getUniformLocation("material.ambient");
+		locs.diffusLight = shader->getUniformLocation("light.diffus");
+		locs.diffusMaterial = shader->getUniformLocation("material.diffus");
+		locs.emissivMaterial = shader->getUniformLocation("material.emissiv");
+		locs.spekularLight = shader->getUniformLocation("light.specular");
+		locs.spekularMaterial = shader->getUniformLocation("material.spekular");
+		locs.shininessMaterial = shader->getUniformLocation("material.shininess");
+
+
 
 
 		// Geometrie
@@ -475,6 +485,22 @@ namespace cgbv
 
 		TwAddVarRW(tweakbar, "Global Rotation", TW_TYPE_QUAT4F, &parameter.globalRotation, "showval=false opened=true");
 		TwAddVarRW(tweakbar, "Lichtrichtung", TW_TYPE_DIR3F, &parameter.lightPos, "group=Light axisx=-x axisy=-y axisz=-z opened=true");
+		TwAddVarRW(tweakbar, "Ambientes Licht", TW_TYPE_COLOR4F, &parameter.ambientLight,
+			" group=Light");
+		TwAddVarRW(tweakbar, "diffuses Licht", TW_TYPE_COLOR4F, &parameter.diffusLight,
+			" group=Light alpha help='Color and transparency of the cube.' ");
+		TwAddVarRW(tweakbar, "Spectacular Licht", TW_TYPE_COLOR4F, &parameter.specularLight,
+			" group=Light alpha help='Color and transparency of the cube.' ");
+		TwAddVarRW(tweakbar, "Emissives Material", TW_TYPE_COLOR4F, &parameter.emissivMaterial,
+			" group=Material alpha help='Color and transparency of the cube.' ");
+		TwAddVarRW(tweakbar, "shininess Licht", TW_TYPE_FLOAT, &parameter.shininessMaterial,
+			" group=Material");
+		TwAddVarRW(tweakbar, "Ambientes Material", TW_TYPE_COLOR4F, &parameter.ambientMaterial,
+			" group=Material alpha help='Color and transparency of the cube.' ");
+		TwAddVarRW(tweakbar, "diffuses Material", TW_TYPE_COLOR4F, &parameter.diffusMaterial,
+			" group=Material alpha help='Color and transparency of the cube.' ");
+		TwAddVarRW(tweakbar, "Spectacular Material", TW_TYPE_COLOR4F, &parameter.spekularMaterial,
+			" group=Material alpha help='Color and transparency of the cube.' ");
 
 		return true;
 	}
@@ -493,6 +519,15 @@ namespace cgbv
 		model *= glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f));
 
 		shader->use();
+		glUniform4fv(locs.ambientLight, 1, glm::value_ptr(parameter.ambientLight));
+		glUniform4fv(locs.diffusLight, 1, glm::value_ptr(parameter.diffusLight));
+		glUniform4fv(locs.spekularLight, 1, glm::value_ptr(parameter.specularLight));
+		glUniform4fv(locs.ambientMaterial, 1, glm::value_ptr(parameter.ambientMaterial));
+		glUniform4fv(locs.diffusMaterial, 1, glm::value_ptr(parameter.diffusMaterial));
+		glUniform4fv(locs.spekularMaterial, 1, glm::value_ptr(parameter.spekularMaterial));
+		glUniform4fv(locs.emissivMaterial, 1, glm::value_ptr(parameter.emissivMaterial));
+		glUniform1f(locs.shininessMaterial, parameter.shininessMaterial);
+
 		normal = glm::transpose(glm::inverse(view * model));
 		glUniformMatrix4fv(locs.modelViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view * model));
 		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));

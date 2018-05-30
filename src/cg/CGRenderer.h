@@ -22,6 +22,22 @@ namespace cgbv
         unsigned int subVertex, subFragment;
 
 		unsigned int lightPos;
+
+		unsigned int ambientLight;
+
+		unsigned int diffusLight;
+
+		unsigned int spekularLight;
+
+		unsigned int ambientMaterial;
+
+		unsigned int diffusMaterial;
+
+		unsigned int spekularMaterial;
+
+		unsigned int emissivMaterial;
+
+		unsigned int shininessMaterial;
     };
 
     struct BufferCombo
@@ -32,7 +48,16 @@ namespace cgbv
 	struct UIParameter
 	{
 		glm::quat globalRotation;
-        glm::vec4 lightPos = glm::vec4(0.f, 0.f, 5.f, 1.f);
+        glm::vec4 lightPos = glm::vec4(0.f, 0.f, 15.f, 1.f);
+		glm::vec4 ambientLight = glm::vec4(0.3f, 0.1f, 0.2f, 1.f);
+		glm::vec4 diffusLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
+		glm::vec4 specularLight = glm::vec4(1.f, 1.f, 1.f, 1.f);
+		glm::vec4 ambientMaterial = glm::vec4(0.7f, 0.4f, 0.8f, 0.8f);
+		glm::vec4 diffusMaterial = glm::vec4(0.7f, 0.4f, 0.8f, 0.7f);
+		glm::vec4 spekularMaterial = glm::vec4(1.f, 1.f, 1.f, 1.f);
+		glm::vec4 emissivMaterial = glm::vec4(0.f, 0.f, 0.f, 0.f);
+		float shininessMaterial = 16.f;
+
 
         float f;
 	};
