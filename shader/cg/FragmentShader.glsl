@@ -167,20 +167,29 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 	vec4 diffus = d*light.diffus*material.diffus;
 	vec4 specular = vec4(0.f, 0.f, 0.f, 0.f);
 	if (d > 0.f) {
-	vec3 r = reflect(-n.lightDir, n.normal);
-	specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
+		vec3 r = reflect(-n.lightDir, n.normal);
+		specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
 	}
-
-//		out_specular = I_in * k_specular * n_fac * pow(max(dot(H, N), 0), shininess);
-	//}
-	//out_color = out_ambient + out_diffus + out_specular;
-
-	//out_color = vec4(n.normal * .5f + .5f, 1);
-	out_color = material.emissiv + ambient + diffus + specular;
+	
+	out_color = material.emissiv + ambient  + specular + diffus;
 }
 
-// =============================================================================================================
 layout (index = 4) subroutine (FragmentProgram) void textured()
 {
-	out_color = texture(textures.tex, Input.uv);
- }
+	Normalized n;
+    n.viewDir = normalize(Input.viewDir);
+    n.lightDir = normalize(Input.lightDir);
+    n.normal = normalize(Input.normal);
+
+	vec4 texel = vec4(0.f, 0.f, 0.f, 0.f);
+	vec4 ambient = light.ambient * material.ambient; 
+	float d = dot(n.normal, n.lightDir);
+	vec4 diffus = d*light.diffus*material.diffus;
+	vec4 specular = vec4(0.f, 0.f, 0.f, 0.f);
+	if (d > 0.f) {
+		vec3 r = reflect(-n.lightDir, n.normal);
+		specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
+	}
+	
+	out_color = material.emissiv + ambient  + specular + texture(textures.tex, Input.uv);
+}

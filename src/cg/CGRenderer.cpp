@@ -214,53 +214,72 @@ namespace cgbv
 
 		//-------------------------------------------------------------------------------------------------------------------------------
 		// Dreieck
-		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
-		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
+		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
 
 		std::vector<glm::vec3> basevertices;
 		std::vector<glm::vec3> basenormals;
-
+		std::vector<glm::vec2> baseuvs;
+		//						 _
+		// Dreieck links oben	| 
+		// unten links
 		basevertices.push_back(glm::vec3(-0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 0.f));
+		// unten rechts
 		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 0.f));
+		// oben links
 		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 1.f));
 
+		// Dreieck rechts oben
+		// oben links
 		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 1.f));
+		// unten rechts
 		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 0.f));
+		// oben rechts
 		basevertices.push_back(glm::vec3(0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 1.f));
 
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-
-
+		
 		std::vector<float> data;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[0]), glm::value_ptr(basevertices[0]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[0]), glm::value_ptr(basenormals[0]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[0]), glm::value_ptr(baseuvs[0]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[1]), glm::value_ptr(basevertices[1]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[1]), glm::value_ptr(basenormals[1]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[1]), glm::value_ptr(baseuvs[1]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[2]), glm::value_ptr(basevertices[2]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[2]), glm::value_ptr(basenormals[2]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[2]), glm::value_ptr(baseuvs[2]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[3]), glm::value_ptr(basevertices[3]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[3]), glm::value_ptr(basenormals[3]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[3]), glm::value_ptr(baseuvs[3]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[4]), glm::value_ptr(basevertices[4]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[4]), glm::value_ptr(basenormals[4]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[4]), glm::value_ptr(baseuvs[4]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		data.insert(std::end(data), glm::value_ptr(basevertices[5]), glm::value_ptr(basevertices[5]) + sizeof(glm::vec3) / sizeof(float));
 		data.insert(std::end(data), glm::value_ptr(basenormals[5]), glm::value_ptr(basenormals[5]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[5]), glm::value_ptr(baseuvs[5]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
 		glGenVertexArrays(1, &disk.vao);
@@ -270,12 +289,17 @@ namespace cgbv
 		glBindBuffer(GL_ARRAY_BUFFER, disk.vbo);
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
+		// Vertex
         glEnableVertexAttribArray(locs.vertex);
-        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float)*6 , nullptr);
+        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float) , nullptr);
+		// Normals
 		glEnableVertexAttribArray(locs.normal);
-		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
+		//UVs
+		glEnableVertexAttribArray(locs.uv);
+		glVertexAttribPointer(locs.uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)size_t(6 * sizeof(float)));
 
-// Code Elisa
+	// Code Elisa
 	/*	locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
 
@@ -414,13 +438,10 @@ namespace cgbv
 
 		////////-------------------------------------------------------------------------------------------------------------------------------
 		//// Würfel bei tessDepth = 0 und bei tessDepth >= 1 Kugel
-		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
-		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
-		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
 		//std::vector<glm::vec3> basevertices;
 		basevertices.clear();
-		int tessDepth = 5;//Input.lightDir.x;
+		int tessDepth = 5;
 		//std::vector<float> data;
 		data.clear();
 
@@ -478,7 +499,7 @@ namespace cgbv
 		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 /* Ein zu betrachtenter Punkt besteht aus 6 float Werten*/, nullptr);
 		glEnableVertexAttribArray(locs.normal);
 		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
-
+		
 		// Texturen
 		glGenSamplers(1, &sampler);
 		glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -565,6 +586,7 @@ namespace cgbv
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
 		//Kugel
+		//glUniform1f(locs.animationUVs, animStage);
 		model = glm::mat4_cast(parameter.globalRotation);
 		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.4f, 0.4f, 0.4f));
 		normal = glm::transpose(glm::inverse(view * model));
@@ -574,6 +596,8 @@ namespace cgbv
 		glBindVertexArray(cone.vao);
 		glDrawArrays(GL_TRIANGLES, 0, cone.vertsToDraw);
 
+		glBindSampler(0, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		TwDraw();
 	}
@@ -581,7 +605,7 @@ namespace cgbv
 
 	void CGRenderer::update()
 	{
-		auto now = std::chrono::high_resolution_clock::now();
+		/*auto now = std::chrono::high_resolution_clock::now();
 		
 		std::chrono::duration<float, std::milli> delta = now - last;
 		
@@ -590,6 +614,6 @@ namespace cgbv
 			if (animStage >= 25.f)
 			animStage = 0.f;
 
-		last = now;
+		last = now;*/
 	}
 }
