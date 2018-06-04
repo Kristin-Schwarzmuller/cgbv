@@ -23,6 +23,7 @@ namespace cgbv
 	{
 		glDeleteVertexArrays(1, &cone.vao);
 		glDeleteBuffers(1, &cone.vbo);
+		glDeleteSamplers(1, &sampler);
 	}
 
 
@@ -132,7 +133,8 @@ namespace cgbv
 
 		glEnable(GL_ALPHA_TEST);
 		glEnable(GL_DEPTH_TEST);
-
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 		projection = glm::perspective(float(M_PI) / 5.f, float(window_width) / float(window_height), .1f, 200.f);
@@ -143,6 +145,7 @@ namespace cgbv
 		shader = std::make_unique<cgbv::shader::GLSLShaderprogram>("../shader/cg/VertexShader.glsl", "../shader/cg/FragmentShader.glsl");
 		locs.vertex = shader->getAttribLocation("vertex");
 		locs.normal = shader->getAttribLocation("normal");
+		locs.uv = shader->getAttribLocation("uvs");
 		locs.modelViewProjection = shader->getUniformLocation("matrices.mvp");
 		locs.normalmatrix = shader->getUniformLocation("matrices.normal");
 		locs.modelview = shader->getUniformLocation("matrices.mv");
@@ -155,8 +158,8 @@ namespace cgbv
 		locs.spekularLight = shader->getUniformLocation("light.specular");
 		locs.spekularMaterial = shader->getUniformLocation("material.spekular");
 		locs.shininessMaterial = shader->getUniformLocation("material.shininess");
-
-
+		locs.texture = shader->getUniformLocation("textures.tex");
+		locs.animationUVs = shader->getUniformLocation("animStage");
 
 
 		// Geometrie
@@ -414,6 +417,7 @@ namespace cgbv
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
 		//std::vector<glm::vec3> basevertices;
 		basevertices.clear();
 		int tessDepth = 5;//Input.lightDir.x;
@@ -475,7 +479,17 @@ namespace cgbv
 		glEnableVertexAttribArray(locs.normal);
 		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
 
+		// Texturen
+		glGenSamplers(1, &sampler);
+		glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, 16.f);
 
+		texture = std::make_unique<cgbv::textures::Texture2D>();
+		texture->Generate("../textures/cg/wall.png", true);
+		
 		////-----------------------------------------------------
 		// GUI
 		TwInit(TW_OPENGL_CORE, nullptr);
@@ -503,6 +517,8 @@ namespace cgbv
 			" group=Material alpha help='Color and transparency of the cube.' ");
 
 		return true;
+
+		last = std::chrono::high_resolution_clock::now();
 	}
 
 
@@ -536,10 +552,15 @@ namespace cgbv
 
 		glUniform3fv(locs.lightPos, 1, glm::value_ptr(parameter.lightPos));
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindSampler(0, sampler);
+		glBindTexture(GL_TEXTURE_2D, texture->getTextureID());
+		glUniform1i(locs.texture, 0);
 
 		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &locs.subFragment);
 		//Rechteck
+		glUniform1f(locs.animationUVs, animStage);
 
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
@@ -560,6 +581,15 @@ namespace cgbv
 
 	void CGRenderer::update()
 	{
+		auto now = std::chrono::high_resolution_clock::now();
+		
+		std::chrono::duration<float, std::milli> delta = now - last;
+		
+			animStage += (delta.count() * 0.02f);
+		
+			if (animStage >= 25.f)
+			animStage = 0.f;
 
+		last = now;
 	}
 }

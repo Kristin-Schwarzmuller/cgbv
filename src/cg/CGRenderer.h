@@ -9,13 +9,14 @@
 #include <Texture.h>
 #include <FrameCounter.h>
 #include <Camera.h>
+#include <chrono>
 
 
 namespace cgbv
 {
     struct ShaderLocations
     {
-        unsigned int vertex, normal;
+		unsigned int vertex, normal, uv;
 
         unsigned int modelViewProjection, normalmatrix, modelview;
 
@@ -38,6 +39,10 @@ namespace cgbv
 		unsigned int emissivMaterial;
 
 		unsigned int shininessMaterial;
+
+		unsigned int texture;
+		
+		unsigned int animationUVs;
     };
 
     struct BufferCombo
@@ -62,9 +67,16 @@ namespace cgbv
         float f;
 	};
 
+	
+
 
 	class CGRenderer : public Renderer
 	{
+		std::unique_ptr<cgbv::textures::Texture2D> texture;
+		unsigned int sampler;
+
+		float animStage = 0.f;
+		std::chrono::high_resolution_clock::time_point last;
         std::unique_ptr<cgbv::shader::GLSLShaderprogram> shader;
 
         ShaderLocations locs;

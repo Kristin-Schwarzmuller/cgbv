@@ -24,9 +24,9 @@ struct Light
 struct VertexOutput
 {
     vec3 normal;
-
 	vec3 lightDir;
 	vec3 viewDir;
+	vec2 uv;
 };
 // =============================================================================================================
 
@@ -45,10 +45,13 @@ subroutine void VertexProgram();
 // =============================================================================================================
 layout(location = 0) in vec4 vertex;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 uvs;
 
 uniform Matrices matrices;
 
 uniform Light light;
+
+uniform float animStage;
 
 subroutine uniform VertexProgram vertexprogram;
 
@@ -73,15 +76,15 @@ void main()
 // =============================================================================================================
 subroutine (VertexProgram) void verts_and_normals()
 {
-    gl_Position = matrices.mvp * vertex;
-
-    Output.normal = matrices.normal * normal;
-
     vec4 h = matrices.mv * vertex;
     vec3 mvPos = h.xyz / h.w;
 
+	gl_Position = matrices.mvp * vertex;
+
+    Output.normal = matrices.normal * normal;
     Output.lightDir = light.lightPos - mvPos;
     Output.viewDir = -mvPos;
+	Output.uv = uvs + vec2(int(animStage) * 0.04f, 0.f);
 }
 
 // Subroutine Implementation

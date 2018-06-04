@@ -38,9 +38,9 @@ float shininess;
 struct FragmentInput
 {
     vec3 normal;
-
 	vec3 lightDir;
 	vec3 viewDir;
+	vec2 uv;
 };
 
 struct Normalized
@@ -49,10 +49,11 @@ struct Normalized
     vec3 lightDir;
     vec3 viewDir;
 };
-// =============================================================================================================
 
-
-
+struct Textures
+{
+	sampler2D tex;
+};
 
 // Subroutines
 // =============================================================================================================
@@ -70,6 +71,9 @@ uniform Matrices matrices;
 
 uniform Light light;
 uniform Material material;
+
+uniform Textures textures;
+uniform float animStage;
 
 
 subroutine uniform FragmentProgram fragmentprogram;
@@ -174,3 +178,9 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 	//out_color = vec4(n.normal * .5f + .5f, 1);
 	out_color = material.emissiv + ambient + diffus + specular;
 }
+
+// =============================================================================================================
+layout (index = 4) subroutine (FragmentProgram) void textured()
+{
+	out_color = texture(textures.tex, Input.uv);
+ }
