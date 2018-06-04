@@ -213,92 +213,7 @@ namespace cgbv
 		//glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
 
 		//-------------------------------------------------------------------------------------------------------------------------------
-		// Dreieck
-		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
-		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
-
-		std::vector<glm::vec3> basevertices;
-		std::vector<glm::vec3> basenormals;
-		std::vector<glm::vec2> baseuvs;
-		//						 _
-		// Dreieck links oben	| 
-		// unten links
-		basevertices.push_back(glm::vec3(-0.5f, -0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(0.f, 0.f));
-		// unten rechts
-		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(1.f, 0.f));
-		// oben links
-		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(0.f, 1.f));
-
-		// Dreieck rechts oben
-		// oben links
-		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(0.f, 1.f));
-		// unten rechts
-		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(1.f, 0.f));
-		// oben rechts
-		basevertices.push_back(glm::vec3(0.5f, 0.5f, 0.f));
-		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
-		baseuvs.push_back(glm::vec2(1.f, 1.f));
-
 		
-		std::vector<float> data;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[0]), glm::value_ptr(basevertices[0]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[0]), glm::value_ptr(basenormals[0]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[0]), glm::value_ptr(baseuvs[0]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[1]), glm::value_ptr(basevertices[1]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[1]), glm::value_ptr(basenormals[1]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[1]), glm::value_ptr(baseuvs[1]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[2]), glm::value_ptr(basevertices[2]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[2]), glm::value_ptr(basenormals[2]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[2]), glm::value_ptr(baseuvs[2]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[3]), glm::value_ptr(basevertices[3]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[3]), glm::value_ptr(basenormals[3]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[3]), glm::value_ptr(baseuvs[3]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[4]), glm::value_ptr(basevertices[4]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[4]), glm::value_ptr(basenormals[4]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[4]), glm::value_ptr(baseuvs[4]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		data.insert(std::end(data), glm::value_ptr(basevertices[5]), glm::value_ptr(basevertices[5]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(basenormals[5]), glm::value_ptr(basenormals[5]) + sizeof(glm::vec3) / sizeof(float));
-		data.insert(std::end(data), glm::value_ptr(baseuvs[5]), glm::value_ptr(baseuvs[5]) + sizeof(glm::vec2) / sizeof(float));
-		disk.vertsToDraw++;
-
-		glGenVertexArrays(1, &disk.vao);
-		glBindVertexArray(disk.vao);
-
-		glGenBuffers(1, &disk.vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, disk.vbo);
-		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
-
-		// Vertex
-        glEnableVertexAttribArray(locs.vertex);
-        glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float) , nullptr);
-		// Normals
-		glEnableVertexAttribArray(locs.normal);
-		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*) size_t(3 * sizeof(float)));
-		//UVs
-		glEnableVertexAttribArray(locs.uv);
-		glVertexAttribPointer(locs.uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)size_t(6 * sizeof(float)));
-
 	// Code Elisa
 	/*	locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "changeByParam");
 		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "simpleTrans");
@@ -438,12 +353,12 @@ namespace cgbv
 
 		////////-------------------------------------------------------------------------------------------------------------------------------
 		//// Würfel bei tessDepth = 0 und bei tessDepth >= 1 Kugel
+		locs.subVertex = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
-		//std::vector<glm::vec3> basevertices;
-		basevertices.clear();
+		std::vector<glm::vec3> basevertices;
 		int tessDepth = 5;
-		//std::vector<float> data;
-		data.clear();
+		std::vector<float> data;
+		
 
 		basevertices.push_back(glm::vec3(-1.f, 1.f, 1.f));
 		basevertices.push_back(glm::vec3(1.f, 1.f, 1.f));
@@ -500,6 +415,93 @@ namespace cgbv
 		glEnableVertexAttribArray(locs.normal);
 		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
 		
+		// Dreieck
+		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
+
+		//std::vector<glm::vec3> basevertices;
+		//std::vector<float> data;
+		std::vector<glm::vec3> basenormals;
+		std::vector<glm::vec2> baseuvs;
+
+		basevertices.clear();
+		data.clear();
+
+		// ------------- Dreieck links oben	 
+		// unten links
+		basevertices.push_back(glm::vec3(-0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 0.f));
+		// unten rechts
+		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 0.f));
+		// oben links
+		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 1.f));
+
+		// -------------  rechts oben
+		// oben links
+		basevertices.push_back(glm::vec3(-0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(0.f, 1.f));
+		// unten rechts
+		basevertices.push_back(glm::vec3(0.5f, -0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 0.f));
+		// oben rechts
+		basevertices.push_back(glm::vec3(0.5f, 0.5f, 0.f));
+		basenormals.push_back(glm::vec3(0.f, 0.f, 1.f));
+		baseuvs.push_back(glm::vec2(1.f, 1.f));
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[0]), glm::value_ptr(basevertices[0]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[0]), glm::value_ptr(basenormals[0]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[0]), glm::value_ptr(baseuvs[0]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[1]), glm::value_ptr(basevertices[1]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[1]), glm::value_ptr(basenormals[1]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[1]), glm::value_ptr(baseuvs[1]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[2]), glm::value_ptr(basevertices[2]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[2]), glm::value_ptr(basenormals[2]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[2]), glm::value_ptr(baseuvs[2]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[3]), glm::value_ptr(basevertices[3]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[3]), glm::value_ptr(basenormals[3]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[3]), glm::value_ptr(baseuvs[3]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[4]), glm::value_ptr(basevertices[4]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[4]), glm::value_ptr(basenormals[4]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[4]), glm::value_ptr(baseuvs[4]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		data.insert(std::end(data), glm::value_ptr(basevertices[5]), glm::value_ptr(basevertices[5]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(basenormals[5]), glm::value_ptr(basenormals[5]) + sizeof(glm::vec3) / sizeof(float));
+		data.insert(std::end(data), glm::value_ptr(baseuvs[5]), glm::value_ptr(baseuvs[5]) + sizeof(glm::vec2) / sizeof(float));
+		disk.vertsToDraw++;
+
+		glGenVertexArrays(1, &disk.vao);
+		glBindVertexArray(disk.vao);
+
+		glGenBuffers(1, &disk.vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, disk.vbo);
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+		// Vertex
+		glEnableVertexAttribArray(locs.vertex);
+		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+		// Normals
+		glEnableVertexAttribArray(locs.normal);
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
+		//UVs
+		glEnableVertexAttribArray(locs.uv);
+		glVertexAttribPointer(locs.uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)size_t(6 * sizeof(float)));
+
+
 		// Texturen
 		glGenSamplers(1, &sampler);
 		glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

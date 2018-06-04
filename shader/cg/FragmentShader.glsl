@@ -190,6 +190,11 @@ layout (index = 4) subroutine (FragmentProgram) void textured()
 		vec3 r = reflect(-n.lightDir, n.normal);
 		specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
 	}
+	vec4 texOrTransparant = texture(textures.tex, Input.uv);
+
+	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) > 0.5f){
+		texOrTransparant = vec4(0.f, 0.f, 0.f, 1.f);
+	}
 	
-	out_color = material.emissiv + ambient  + specular + texture(textures.tex, Input.uv);
+	out_color = material.emissiv + ambient  + specular + texOrTransparant;
 }
