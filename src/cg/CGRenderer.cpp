@@ -604,6 +604,7 @@ namespace cgbv
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &locs.subFragment);
 
 		//Rechteck
+		glUniform1f(locs.animationUVs, animStage);
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
 
@@ -638,7 +639,7 @@ namespace cgbv
 
 	void CGRenderer::update()
 	{
-		/*auto now = std::chrono::high_resolution_clock::now();
+		auto now = std::chrono::high_resolution_clock::now();
 		
 		std::chrono::duration<float, std::milli> delta = now - last;
 		
@@ -647,6 +648,6 @@ namespace cgbv
 			if (animStage >= 25.f)
 			animStage = 0.f;
 
-		last = now;*/
+		last = now;
 	}
 }

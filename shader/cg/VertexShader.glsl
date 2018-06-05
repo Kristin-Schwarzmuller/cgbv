@@ -99,6 +99,6 @@ subroutine (VertexProgram) void simpleTrans()
     vec3 mvPos = h.xyz / h.w;
 
     Output.lightDir = light.lightPos - mvPos;
-	Output.uv = uvs; //+ vec2(int(animStage) * 0.04f, 0.f);
+	Output.uv =  vec2(int(animStage) * 0.04f, 0.f); //uvs;
 }
 // =============================================================================================================
