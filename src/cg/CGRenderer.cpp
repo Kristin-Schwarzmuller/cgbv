@@ -21,8 +21,12 @@ namespace cgbv
 
 	void CGRenderer::destroy()
 	{
+		glDeleteVertexArrays(1, &disk.vao);
+		glDeleteBuffers(1, &disk.vbo);
 		glDeleteVertexArrays(1, &cone.vao);
 		glDeleteBuffers(1, &cone.vbo);
+		glDeleteVertexArrays(1, &moon.vao);
+		glDeleteBuffers(1, &moon.vbo);
 		glDeleteSamplers(1, &sampler);
 	}
 
@@ -414,6 +418,20 @@ namespace cgbv
 		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 /* Ein zu betrachtenter Punkt besteht aus 6 float Werten*/, nullptr);
 		glEnableVertexAttribArray(locs.normal);
 		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
+
+		moon.vertsToDraw = cone.vertsToDraw;
+		glGenVertexArrays(1, &moon.vao);
+		glBindVertexArray(moon.vao);
+
+		glGenBuffers(1, &moon.vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, moon.vbo);
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(locs.vertex);
+		glVertexAttribPointer(locs.vertex, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 /* Ein zu betrachtenter Punkt besteht aus 6 float Werten*/, nullptr);
+		glEnableVertexAttribArray(locs.normal);
+		glVertexAttribPointer(locs.normal, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)size_t(3 * sizeof(float)));
+
 		
 		// Dreieck
 		locs.subFragment = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
@@ -484,6 +502,9 @@ namespace cgbv
 		data.insert(std::end(data), glm::value_ptr(baseuvs[5]), glm::value_ptr(baseuvs[5]) + sizeof(glm::vec2) / sizeof(float));
 		disk.vertsToDraw++;
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glGenVertexArrays(1, &disk.vao);
 		glBindVertexArray(disk.vao);
 
@@ -500,7 +521,6 @@ namespace cgbv
 		//UVs
 		glEnableVertexAttribArray(locs.uv);
 		glVertexAttribPointer(locs.uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (const void*)size_t(6 * sizeof(float)));
-
 
 		// Texturen
 		glGenSamplers(1, &sampler);
@@ -582,13 +602,12 @@ namespace cgbv
 
 		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &locs.subFragment);
-		//Rechteck
-		glUniform1f(locs.animationUVs, animStage);
 
+		//Rechteck
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
+
 		//Kugel
-		//glUniform1f(locs.animationUVs, animStage);
 		model = glm::mat4_cast(parameter.globalRotation);
 		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.4f, 0.4f, 0.4f));
 		normal = glm::transpose(glm::inverse(view * model));
@@ -597,6 +616,18 @@ namespace cgbv
 		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
 		glBindVertexArray(cone.vao);
 		glDrawArrays(GL_TRIANGLES, 0, cone.vertsToDraw);
+
+		// Mond
+		//glUniform1f(locs.animationUVs, animStage);
+		model = glm::translate(model, glm::vec3(0.f, 1.0f, 0.f));
+		model = glm::mat4_cast(parameter.globalRotation);
+		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.1f, 0.1f, 0.1f));
+		normal = glm::transpose(glm::inverse(view * model));
+		glUniformMatrix4fv(locs.modelViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view * model));
+		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));
+		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
+		glBindVertexArray(moon.vao);
+		glDrawArrays(GL_TRIANGLES, 0, moon.vertsToDraw);
 
 		glBindSampler(0, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);

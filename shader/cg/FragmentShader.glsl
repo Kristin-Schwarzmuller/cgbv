@@ -170,6 +170,10 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
 		vec3 r = reflect(-n.lightDir, n.normal);
 		specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
 	}
+
+	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) > 0.25f){
+		diffus = vec4(0.f, 0.f, 0.f, 1.f);
+	}
 	
 	out_color = material.emissiv + ambient  + specular + diffus;
 }
@@ -192,8 +196,8 @@ layout (index = 4) subroutine (FragmentProgram) void textured()
 	}
 	vec4 texOrTransparant = texture(textures.tex, Input.uv);
 
-	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) > 0.5f){
-		texOrTransparant = vec4(0.f, 0.f, 0.f, 1.f);
+	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) > 0.25f){
+		texOrTransparant = vec4(0.f, 0.f, 0.f, 0.f);
 	}
 	
 	out_color = material.emissiv + ambient  + specular + texOrTransparant;

@@ -81,7 +81,7 @@ namespace cgbv
 
         ShaderLocations locs;
 
-		BufferCombo cone, disk;
+		BufferCombo cone, disk, moon;
 
         glm::mat4 projection, model;
 
