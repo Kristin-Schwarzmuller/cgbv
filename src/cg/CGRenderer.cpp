@@ -601,11 +601,10 @@ namespace cgbv
 		glUniform1i(locs.texture, 0);
 
 		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
-		auto phong = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
-		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &phong);
+		auto textured = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "textured");
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &textured);
 
 		//Rechteck
-		glUniform1f(locs.animationUVs, animStage);
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
 
@@ -619,21 +618,24 @@ namespace cgbv
 
 
 		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
-		auto textured = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
-		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &textured);
+		auto phong = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "phong");
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &phong);
 		glBindVertexArray(cone.vao);
 		glDrawArrays(GL_TRIANGLES, 0, cone.vertsToDraw);
 
 		// Mond
-		//glUniform1f(locs.animationUVs, animStage);
+		glUniform1f(locs.animationUVs, animStage);
 		model = glm::mat4_cast(parameter.globalRotation);
-		model = glm::translate(model, glm::vec3(0.6f, 1.5f, 0.f));
+		model = glm::translate(model, glm::vec3(0.6f, 1.5f, 0.6f));
 		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.1f, 0.1f, 0.1f));
 		normal = glm::transpose(glm::inverse(view * model));
 		glUniformMatrix4fv(locs.modelViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view * model));
 		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));
 		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
 
+		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
+		auto moonShine = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "moonShine");
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &moonShine);
 		glBindVertexArray(moon.vao);
 		glDrawArrays(GL_TRIANGLES, 0, moon.vertsToDraw);
 

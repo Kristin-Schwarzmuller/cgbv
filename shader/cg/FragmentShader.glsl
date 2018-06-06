@@ -27,11 +27,11 @@ struct Light
 
 struct Material 
 {
-vec4 ambient;
-vec4 diffus;
-vec4 spekular;
-vec4 emissiv;
-float shininess;
+	vec4 ambient;
+	vec4 diffus;
+	vec4 spekular;
+	vec4 emissiv;
+	float shininess;
 };
 
 
@@ -161,7 +161,6 @@ layout (index = 3) subroutine (FragmentProgram) void phong()
     n.lightDir = normalize(Input.lightDir);
     n.normal = normalize(Input.normal);
 
-	vec4 texel = vec4(0.f, 0.f, 0.f, 1.f);
 	vec4 ambient = light.ambient * material.ambient; 
 	float d = dot(n.normal, n.lightDir);
 	vec4 diffus = d*light.diffus*material.diffus;
@@ -181,7 +180,6 @@ layout (index = 4) subroutine (FragmentProgram) void textured()
     n.lightDir = normalize(Input.lightDir);
     n.normal = normalize(Input.normal);
 
-	vec4 texel = vec4(0.f, 0.f, 0.f, 0.f);
 	vec4 ambient = light.ambient * material.ambient; 
 	float d = dot(n.normal, n.lightDir);
 	vec4 diffus = d*light.diffus*material.diffus;
@@ -198,4 +196,24 @@ layout (index = 4) subroutine (FragmentProgram) void textured()
 	}
 	
 	out_color = material.emissiv + ambient  + specular + texOrTransparant;
+}
+
+layout (index = 5) subroutine (FragmentProgram) void moonShine()
+{
+	vec4 moonShineEmission = vec4(0.5f, 0.5f, 0.5f, 1.f);
+	Normalized n;
+    n.viewDir = normalize(Input.viewDir);
+    n.lightDir = normalize(Input.lightDir);
+    n.normal = normalize(Input.normal);
+
+	vec4 ambient = light.ambient * material.ambient; 
+	float d = dot(n.normal, n.lightDir);
+	vec4 diffus = d*light.diffus*material.diffus;
+	vec4 specular = vec4(0.f, 0.f, 0.f, 1.f);
+	if (d > 0.f) {
+		vec3 r = reflect(-n.lightDir, n.normal);
+		specular = pow(max(dot(normalize (r), n.normal), 0), material.shininess)*light.specular*material.spekular;
+	}
+	
+	out_color = (material.emissiv + moonShineEmission) + ambient  + specular + diffus;
 }
