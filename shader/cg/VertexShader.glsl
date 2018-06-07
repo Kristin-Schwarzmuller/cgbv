@@ -84,7 +84,7 @@ subroutine (VertexProgram) void verts_and_normals()
     Output.normal = matrices.normal * normal;
     Output.lightDir = light.lightPos - mvPos;
     Output.viewDir = -mvPos;
-	Output.uv = uvs; // + vec2(int(animStage) * 0.04f, 0.f);
+	Output.uv = uvs + vec2(int(animStage) * 0.04f, 0.f);
 }
 
 // Subroutine Implementation
@@ -99,6 +99,6 @@ subroutine (VertexProgram) void simpleTrans()
     vec3 mvPos = h.xyz / h.w;
 
     Output.lightDir = light.lightPos - mvPos;
-	Output.uv =  vec2(int(animStage) * 0.04f, 0.f); //uvs;
+	Output.uv =  uvs + vec2(int(animStage) * 0.04f, 0.f); 
 }
 // =============================================================================================================

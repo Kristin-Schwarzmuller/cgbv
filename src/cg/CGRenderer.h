@@ -42,7 +42,11 @@ namespace cgbv
 
 		unsigned int texture;
 		
-		unsigned int animationUVs;
+		unsigned int animationUVs, takt;
+
+		float radius = 1.5f;
+
+		float velocity = 1.0f;
     };
 
     struct BufferCombo
@@ -61,6 +65,8 @@ namespace cgbv
 		glm::vec4 diffusMaterial = glm::vec4(0.7f, 0.4f, 0.8f, 0.7f);
 		glm::vec4 spekularMaterial = glm::vec4(1.f, 1.f, 1.f, 1.f);
 		glm::vec4 emissivMaterial = glm::vec4(0.f, 0.f, 0.f, 0.f);
+		glm::vec4 moonShineEmission = emissivMaterial + glm::vec4(0.5f, 0.5f, 0.5f, 1.f);
+			 
 		float shininessMaterial = 16.f;
 
 

@@ -648,14 +648,16 @@ namespace cgbv
 
 	void CGRenderer::update()
 	{
+
+
 		auto now = std::chrono::high_resolution_clock::now();
 		
 		std::chrono::duration<float, std::milli> delta = now - last;
 		
 			animStage += (delta.count() * 0.02f);
-		
+
 			if (animStage >= 25.f)
-			animStage = 0.f;
+				animStage = 0.f;
 
 		last = now;
 	}
