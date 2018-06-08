@@ -656,8 +656,8 @@ namespace cgbv
 		
 			animStage += (delta.count() * 0.02f);
 
-			if (animStage >= 25.f)
-				animStage = 0.f;
+			//if (animStage >= 25.f)
+				//animStage = 0.f;
 
 		last = now;
 	}
