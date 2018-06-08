@@ -9,6 +9,8 @@ struct Matrices
 	mat4 mvp;
 	mat4 mv;
 	mat3 normal;
+
+	mat2 uv;
 };
 
 
@@ -85,21 +87,21 @@ subroutine (VertexProgram) void verts_and_normals()
     Output.lightDir = light.lightPos - mvPos;
     Output.viewDir = -mvPos;
 	vec2 rotation = uvs + vec2(cos(float(animStage)* 0.1f) , sin(float(animStage)* 0.1f));
-	Output.uv = rotation; //* dot(rotation, rotation); // uvs + vec2(int(animStage) * 0.04f, 0.f);
+	Output.uv =   (matrices.uv * (uvs - 0.5f)) + 0.5f; //rotation; // dot(uvs, uvs); // uvs + vec2(int(animStage) * 0.04f, 0.f);
 }
 
 // Subroutine Implementation
 // =============================================================================================================
-subroutine (VertexProgram) void simpleTrans()
+subroutine (VertexProgram) void rotation()
 {
     gl_Position = matrices.mvp * vertex;
-
-	Output.normal = matrices.normal * normal;
 
 	vec4 h = matrices.mv * vertex;
     vec3 mvPos = h.xyz / h.w;
 
+	Output.normal = matrices.normal * normal;
     Output.lightDir = light.lightPos - mvPos;
-	Output.uv =  uvs + vec2(cos(float(animStage)* 0.1f) , sin(float(animStage)* 0.1f)); 
+	Output.viewDir = -mvPos; //+ vec3(cos(float(animStage)* 0.1f) , sin(float(animStage)* 0.1f), 0);
+	Output.uv = uvs;// (matrices.uv * (uvs - 0.5f)) + 0.5f; // + vec2(cos(float(animStage)* 0.1f) , sin(float(animStage)* 0.1f)); 
 }
 // =============================================================================================================

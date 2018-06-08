@@ -42,11 +42,7 @@ namespace cgbv
 
 		unsigned int texture;
 		
-		unsigned int animationUVs, takt;
-
-		float radius = 1.5f;
-
-		float velocity = 1.0f;
+		unsigned int uvMatrix;
     };
 
     struct BufferCombo
@@ -90,6 +86,8 @@ namespace cgbv
 		BufferCombo cone, disk, moon;
 
         glm::mat4 projection, model;
+		glm::mat2 uvMatrix;
+		float uvRotation = 0.f;
 
         glm::mat3 normal;
 

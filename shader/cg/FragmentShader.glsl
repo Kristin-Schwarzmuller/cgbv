@@ -14,6 +14,8 @@ struct Matrices
 	mat4 mvp;
 	mat4 mv;
 	mat3 normal;
+
+	mat2 uv;
 };
 
 
@@ -191,11 +193,13 @@ layout (index = 4) subroutine (FragmentProgram) void textured()
 	vec4 texOrTransparant = texture(textures.tex, Input.uv);
 
 	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) > 0.25f){
-		texOrTransparant = vec4(1.f, 1.f, 1.f, 0.f);
-		discard;
+		discard; // = wegwerfen
+	}
+	if(dot(Input.uv - vec2(0.5f, 0.5f), Input.uv - vec2(0.5f, 0.5f)) < 0.15f){
+		discard; // = wegwerfen
 	}
 	
-	out_color = material.emissiv + ambient  + specular + texOrTransparant;
+	out_color = texOrTransparant + ambient  + specular + diffus;
 }
 
 layout (index = 5) subroutine (FragmentProgram) void moonShine()

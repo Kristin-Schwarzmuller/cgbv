@@ -153,6 +153,7 @@ namespace cgbv
 		locs.modelViewProjection = shader->getUniformLocation("matrices.mvp");
 		locs.normalmatrix = shader->getUniformLocation("matrices.normal");
 		locs.modelview = shader->getUniformLocation("matrices.mv");
+		locs.uvMatrix = shader->getUniformLocation("matrices.uv");
 		locs.lightPos = shader->getUniformLocation("light.lightPos");
 		locs.ambientLight = shader->getUniformLocation("light.ambient");
 		locs.ambientMaterial = shader->getUniformLocation("material.ambient");
@@ -163,7 +164,7 @@ namespace cgbv
 		locs.spekularMaterial = shader->getUniformLocation("material.spekular");
 		locs.shininessMaterial = shader->getUniformLocation("material.shininess");
 		locs.texture = shader->getUniformLocation("textures.tex");
-		locs.animationUVs = shader->getUniformLocation("animStage");
+		//locs.animationUVs = shader->getUniformLocation("animStage");
 
 
 		// Geometrie
@@ -531,7 +532,8 @@ namespace cgbv
 		glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, 16.f);
 
 		texture = std::make_unique<cgbv::textures::Texture2D>();
-		texture->Generate("../textures/cg/wall.png", true);
+		//texture->Generate("../textures/cg/wall.png", true);
+		texture->Generate("../textures/cg/th.jpg", true);
 		
 		////-----------------------------------------------------
 		// GUI
@@ -591,6 +593,7 @@ namespace cgbv
 		glUniformMatrix4fv(locs.modelViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view * model));
 		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));
 		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
+		glUniformMatrix2fv(locs.uvMatrix, 1, GL_FALSE, glm::value_ptr(uvMatrix));
 
 
 		glUniform3fv(locs.lightPos, 1, glm::value_ptr(parameter.lightPos));
@@ -605,6 +608,11 @@ namespace cgbv
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &textured);
 
 		//Rechteck
+		//glUniform1f(locs.animationUVs, animStage);
+		//glPushMatrix();
+		//glRotatef(10.f, 0.0, 0.0, 1.0); // Rotate the object.					   
+		//glPopMatrix();					// Draw the object
+
 		glBindVertexArray(disk.vao);
 		glDrawArrays(GL_TRIANGLES, 0, disk.vertsToDraw);
 
@@ -624,7 +632,6 @@ namespace cgbv
 		glDrawArrays(GL_TRIANGLES, 0, cone.vertsToDraw);
 
 		// Mond
-		glUniform1f(locs.animationUVs, animStage);
 		model = glm::mat4_cast(parameter.globalRotation);
 		model = glm::translate(model, glm::vec3(0.6f, 1.5f, 0.6f));
 		model *= glm::scale(glm::mat4(1.f), glm::vec3(0.1f, 0.1f, 0.1f));
@@ -633,7 +640,8 @@ namespace cgbv
 		glUniformMatrix4fv(locs.modelview, 1, GL_FALSE, glm::value_ptr(view * model));
 		glUniformMatrix3fv(locs.normalmatrix, 1, GL_FALSE, glm::value_ptr(normal));
 
-		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &locs.subVertex);
+		/*auto rotation = shader->getSubroutineIndex(GL_VERTEX_SHADER, "verts_and_normals");
+		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &rotation);*/
 		auto moonShine = shader->getSubroutineIndex(GL_FRAGMENT_SHADER, "moonShine");
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &moonShine);
 		glBindVertexArray(moon.vao);
@@ -648,16 +656,15 @@ namespace cgbv
 
 	void CGRenderer::update()
 	{
-
-
 		auto now = std::chrono::high_resolution_clock::now();
 		
 		std::chrono::duration<float, std::milli> delta = now - last;
+		std::cout << delta.count() << std::endl << uvRotation << std::endl << std::endl;
 		
-			animStage += (delta.count() * 0.02f);
+		animStage += (delta.count() * 0.02f);
 
-			//if (animStage >= 25.f)
-				//animStage = 0.f;
+		uvRotation += 0.05f; // (delta.count() * 10.f);
+		uvMatrix = glm::mat2(std::cos(uvRotation), -std::sin(uvRotation), std::sin(uvRotation), std::cos(uvRotation));
 
 		last = now;
 	}
