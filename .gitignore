@@ -40,7 +40,6 @@ CMakeLists.txt
 
 textures/*
 !textures/bv/*
-!textures/cg/*
 \.vs/
 Debug
 Release
