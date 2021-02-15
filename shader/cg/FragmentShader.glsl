@@ -96,7 +96,6 @@ void main()
 
 
 
-
 // Subroutine Implementation
 // =============================================================================================================
 layout (index = 0) subroutine (FragmentProgram) void toon()
